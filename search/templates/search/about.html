@@ -1,0 +1,102 @@
+{% extends 'search/base.html' %}
+
+{% block title %}Loyiha haqida - Recept24{% endblock %}
+
+{% block extra_css %}
+    .about-section {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 50px;
+        border-radius: 40px;
+    }
+
+    .about-section h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: var(--text-main);
+    }
+
+    .about-section p {
+        font-size: 18px;
+        line-height: 1.8;
+        color: var(--text-muted);
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+
+    .feature-card {
+        padding: 40px 30px;
+        border-radius: 28px;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-icon {
+        font-size: 50px;
+        margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+        font-size: 22px;
+        margin-bottom: 15px;
+        color: var(--green-light);
+    }
+
+    .feature-card p {
+        color: var(--text-muted);
+        line-height: 1.6;
+        font-size: 16px;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="glass-panel about-section">
+        <h1>Recept24 haqida</h1>
+        <p>Recept24 – O'zbekistondagi dori vositalari bo'yicha eng tezkor va ishonchli qidiruv tizimidir. Biz foydalanuvchilarga o'zlariga kerakli dori vositalari narxini va malumotlarini oson topishlari uchun zamonaviy, qulay va xavfsiz platforma taqdim etamiz.</p>
+        <p>Bizning maqsadimiz aholini ishonchli ma'lumotlar bilan ta'minlash va sog'liqni saqlash sohasida raqamli innovatsiyalarni joriy etishdir.</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Tezkor qidiruv</h3>
+                <p>Minglab dorilar bazasidan o'zingizga keraklisini soniyalar ichida topishingiz mumkin.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Ishonchli sifat</h3>
+                <p>Ma'lumotlar faqat rasmiy ruxsatga ega va litsenziyalangan manbalardan olinadi.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>Premium dizayn</h3>
+                <p>Siz uchun Apple dizayn uslubidagi, ko'zni toliqtirmaydigan qulay interfeys yaratilgan.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Aniq narxlar</h3>
+                <p>Ishlab chiqaruvchilarning o'rtacha narxlarini doimiy tarzda monitoring qilib boramiz.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelector('a[href="{% url 'about' %}"]').classList.add('active');
+</script>
+{% endblock %}

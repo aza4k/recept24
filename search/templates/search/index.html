@@ -1,0 +1,668 @@
+{% extends 'search/base.html' %}
+
+{% block extra_css %}
+    .hero {
+        text-align: center;
+        padding: 60px 5% 80px;
+        background-color: var(--navbar-bg);
+        color: var(--white);
+        margin-bottom: 40px;
+    }
+
+    .hero h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .hero p {
+        font-size: 16px;
+        color: #cbd5e1;
+        margin-bottom: 40px;
+    }
+
+    .search-wrapper {
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .search-form {
+        display: flex;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 6px;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    
+    .search-form:focus-within {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
+    }
+
+    .search-icon {
+        padding: 0 15px;
+        display: flex;
+        align-items: center;
+        color: var(--text-muted);
+    }
+
+    .search-input {
+        flex: 1;
+        border: none;
+        padding: 12px 0;
+        font-size: 16px;
+        color: var(--text-main);
+        outline: none;
+        background: transparent;
+    }
+
+    .search-btn {
+        background-color: var(--primary);
+        color: var(--white);
+        border: none;
+        padding: 0 25px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .search-btn:hover {
+        background-color: var(--primary-dark);
+    }
+
+    /* Auto-suggest dropdown */
+    .autocomplete-dropdown {
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 0;
+        right: 0;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        z-index: 100;
+        max-height: 250px;
+        overflow-y: auto;
+        display: none;
+        text-align: left;
+    }
+
+    .dropdown-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
+        font-size: 15px;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f1f5f9;
+    }
+
+    /* Selected Tags */
+    .selected-medicines {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: center;
+    }
+
+    .med-tag {
+        background-color: var(--white);
+        border: 1px solid var(--border-color);
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--text-main);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .med-tag span {
+        cursor: pointer;
+        color: #ef4444;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fee2e2;
+        font-size: 12px;
+    }
+
+    /* Sort Tabs */
+    .sort-tabs {
+        display: flex;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .sort-tab {
+        flex: 1;
+        padding: 12px 20px;
+        text-align: center;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--text-muted);
+        border: none;
+        background: none;
+        transition: all 0.2s;
+    }
+
+    .sort-tab:first-child {
+        border-right: 1px solid var(--border-color);
+    }
+
+    .sort-tab.active {
+        background-color: var(--primary);
+        color: var(--white);
+    }
+
+    .sort-tab:hover:not(.active) {
+        background-color: #f1f5f9;
+    }
+
+    /* Pharmacy Results */
+    .pharmacy-results {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .pharmacy-card {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .pharm-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .pharm-logo-info {
+        display: flex;
+        gap: 15px;
+    }
+
+    .pharm-logo {
+        width: 50px;
+        height: 50px;
+        background-color: #f1f5f9;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: var(--primary);
+        flex-shrink: 0;
+    }
+
+    .pharm-info h3 {
+        font-size: 18px;
+        margin-bottom: 4px;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .verified-badge {
+        color: #3b82f6;
+        font-size: 14px;
+    }
+
+    .pharm-meta {
+        color: var(--text-muted);
+        font-size: 13px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .pharm-meta i {
+        width: 16px;
+        text-align: center;
+        margin-right: 4px;
+    }
+
+    .distance-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .pharm-price-actions {
+        text-align: right;
+    }
+
+    .total-price {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 12px;
+    }
+
+    .pharm-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--white);
+        color: var(--text-main);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .action-btn:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .action-btn.call-btn {
+        background-color: #f0fdf4;
+        border-color: #bbf7d0;
+        color: #166534;
+    }
+
+    .action-btn.call-btn:hover {
+        background-color: #dcfce7;
+    }
+
+    .action-btn.map-btn {
+        background-color: #eff6ff;
+        border-color: #bfdbfe;
+        color: #1e40af;
+    }
+
+    .action-btn.map-btn:hover {
+        background-color: #dbeafe;
+    }
+
+    .pharm-medicines {
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid var(--border-color);
+    }
+
+    .stock-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px dashed var(--border-color);
+        font-size: 14px;
+    }
+
+    .stock-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .stock-name {
+        color: var(--text-main);
+    }
+    
+    .stock-name i {
+        color: var(--primary);
+        margin-right: 6px;
+    }
+
+    .stock-price {
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+    }
+
+    .empty-icon {
+        font-size: 40px;
+        color: #cbd5e1;
+        margin-bottom: 15px;
+    }
+
+    .empty-state h3 {
+        font-size: 18px;
+        color: var(--text-main);
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .results-count {
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .pharm-header { flex-direction: column; }
+        .pharm-price-actions { text-align: left; margin-top: 10px; width: 100%; }
+        .pharm-actions { justify-content: flex-start; flex-wrap: wrap; }
+        .sort-tabs { width: 100%; }
+    }
+{% endblock %}
+
+{% block content %}
+    <header class="hero">
+        <h1>Dorilarni izlash va taqqoslash</h1>
+        <p>Istalgan dorilarni kiriting va eng arzon takliflarni toping</p>
+        
+        <div class="search-wrapper">
+            <form method="GET" action="{% url 'index' %}" id="search-form" class="search-form">
+                <div class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <input type="text" id="search-input" class="search-input" placeholder="Dori nomini kiriting..." autocomplete="off">
+                <button type="submit" class="search-btn">Qidirish</button>
+                <div id="selected-medicines-inputs">
+                    {% for med in selected_medicines %}
+                        <input type="hidden" name="m" value="{{ med.id }}">
+                    {% endfor %}
+                </div>
+            </form>
+            <div id="autocomplete-dropdown" class="autocomplete-dropdown"></div>
+        </div>
+        
+        <div class="selected-medicines" id="selected-medicines-tags"></div>
+    </header>
+
+<div class="container">
+    <main>
+        {% if selected_medicines %}
+
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Topilgan dorixonalar</h2>
+                    <span class="results-count">{{ pharmacies_data|length }} ta natija</span>
+                </div>
+                <div class="sort-tabs">
+                    <button class="sort-tab active" id="sort-cheap" onclick="sortBy('cheap')">
+                        <i class="fa-solid fa-tag"></i> Arzonroq
+                    </button>
+                    <button class="sort-tab" id="sort-near" onclick="sortBy('near')">
+                        <i class="fa-solid fa-location-crosshairs"></i> Yaqinroq
+                    </button>
+                </div>
+            </div>
+            
+            <div class="pharmacy-results" id="pharmacy-list">
+                {% for item in pharmacies_data %}
+                <div class="pharmacy-card" data-lat="{{ item.lat }}" data-lng="{{ item.lng }}" data-price="{{ item.total_price }}">
+                    <div class="pharm-header">
+                        <div class="pharm-logo-info">
+                            <div class="pharm-logo"><i class="fa-solid fa-house-medical"></i></div>
+                            <div class="pharm-info">
+                                <h3>{{ item.pharmacy.name }} <i class="fa-solid fa-circle-check verified-badge"></i></h3>
+                                <div class="pharm-meta">
+                                    <span><i class="fa-solid fa-location-dot"></i> {{ item.pharmacy.address }}</span>
+                                    <span><i class="fa-regular fa-clock"></i> 08:00 - 23:59</span>
+                                    <span class="distance-badge" style="display:none;">
+                                        <i class="fa-solid fa-person-walking"></i> <span class="dist-text">—</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pharm-price-actions">
+                            <div class="total-price">{{ item.total_price|floatformat:0 }} so'm</div>
+                            <div class="pharm-actions">
+                                <a href="tel:{{ item.pharmacy.phone }}" class="action-btn call-btn">
+                                    <i class="fa-solid fa-phone"></i> Qo'ng'iroq
+                                </a>
+                                <a href="https://yandex.uz/maps/?pt={{ item.lng }},{{ item.lat }}&z=17&l=map" target="_blank" class="action-btn map-btn">
+                                    <i class="fa-solid fa-map-location-dot"></i> Xaritada
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pharm-medicines">
+                        {% for stock in item.stocks %}
+                        <div class="stock-item">
+                            <span class="stock-name"><i class="fa-solid fa-check"></i> {{ stock.medicine.name }} <span style="color:var(--text-muted); font-size:12px;">({{ stock.medicine.manufacturer }})</span></span>
+                            <span class="stock-price">{{ stock.price|floatformat:0 }} so'm</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-box-open empty-icon"></i>
+                    <h3>Dorixona topilmadi</h3>
+                    <p>Ushbu ro'yxatdagi barcha dorilar birdaniga mavjud bo'lgan dorixona topilmadi.</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-pills empty-icon"></i>
+                <h3>Ro'yxat bo'sh</h3>
+                <p>Qidiruvni boshlash uchun yuqoridagi maydonga dori nomini yozing.</p>
+            </div>
+        {% endif %}
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('search-input');
+        const dropdown = document.getElementById('autocomplete-dropdown');
+        const tagsContainer = document.getElementById('selected-medicines-tags');
+        const inputsContainer = document.getElementById('selected-medicines-inputs');
+        
+        let selectedMedicines = [
+            {% for med in selected_medicines %}
+                {id: "{{ med.id }}", name: "{{ med.name }}"}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        function renderSelected() {
+            tagsContainer.innerHTML = '';
+            inputsContainer.innerHTML = '';
+            
+            selectedMedicines.forEach(med => {
+                const tag = document.createElement('div');
+                tag.className = 'med-tag';
+                tag.innerHTML = `${med.name} <span onclick="removeMed('${med.id}')"><i class="fa-solid fa-xmark"></i></span>`;
+                tagsContainer.appendChild(tag);
+                
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'm';
+                input.value = med.id;
+                inputsContainer.appendChild(input);
+            });
+        }
+
+        window.removeMed = function(id) {
+            selectedMedicines = selectedMedicines.filter(m => String(m.id) !== String(id));
+            renderSelected();
+        }
+
+        let timeoutId;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(timeoutId);
+            const q = e.target.value.trim();
+            
+            if (q.length > 1) {
+                timeoutId = setTimeout(async () => {
+                    try {
+                        const res = await fetch(`/api/search/?q=${q}`);
+                        const data = await res.json();
+                        
+                        dropdown.innerHTML = '';
+                        if (data.length > 0) {
+                            data.forEach(med => {
+                                const item = document.createElement('div');
+                                item.className = 'dropdown-item';
+                                item.innerHTML = `<i class="fa-solid fa-capsules" style="color:var(--text-muted); margin-right:8px;"></i> ${med.name}`;
+                                item.onclick = () => {
+                                    if(!selectedMedicines.find(m => String(m.id) === String(med.id))) {
+                                        selectedMedicines.push(med);
+                                        renderSelected();
+                                    }
+                                    searchInput.value = '';
+                                    dropdown.style.display = 'none';
+                                    searchInput.focus();
+                                };
+                                dropdown.appendChild(item);
+                            });
+                            dropdown.style.display = 'block';
+                        } else {
+                            dropdown.style.display = 'none';
+                        }
+                    } catch(e) {
+                        console.error(e);
+                    }
+                }, 300);
+            } else {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-wrapper')) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        renderSelected();
+
+        // ===== Geolocation & Distance =====
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        let userLat = null, userLng = null;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                userLat = pos.coords.latitude;
+                userLng = pos.coords.longitude;
+                
+                document.querySelectorAll('.pharmacy-card').forEach(card => {
+                    const lat = parseFloat(card.dataset.lat);
+                    const lng = parseFloat(card.dataset.lng);
+                    if (lat && lng) {
+                        const dist = haversine(userLat, userLng, lat, lng);
+                        card.dataset.distance = dist;
+                        const badge = card.querySelector('.distance-badge');
+                        const text = card.querySelector('.dist-text');
+                        if (badge && text) {
+                            text.textContent = dist < 1 
+                                ? `${Math.round(dist * 1000)} m` 
+                                : `${dist.toFixed(1)} km`;
+                            badge.style.display = 'inline-flex';
+                        }
+                    }
+                });
+            }, () => {
+                console.log('Geolokatsiya ruxsati berilmadi.');
+            });
+        }
+
+        // ===== Sorting =====
+        window.sortBy = function(mode) {
+            const list = document.getElementById('pharmacy-list');
+            if (!list) return;
+
+            const cheapTab = document.getElementById('sort-cheap');
+            const nearTab = document.getElementById('sort-near');
+            
+            if (mode === 'cheap') {
+                cheapTab.classList.add('active');
+                nearTab.classList.remove('active');
+            } else {
+                nearTab.classList.add('active');
+                cheapTab.classList.remove('active');
+            }
+
+            const cards = Array.from(list.querySelectorAll('.pharmacy-card'));
+            
+            cards.sort((a, b) => {
+                if (mode === 'near') {
+                    const dA = parseFloat(a.dataset.distance) || 99999;
+                    const dB = parseFloat(b.dataset.distance) || 99999;
+                    return dA - dB;
+                } else {
+                    const pA = parseFloat(a.dataset.price) || 0;
+                    const pB = parseFloat(b.dataset.price) || 0;
+                    return pA - pB;
+                }
+            });
+
+            cards.forEach(card => list.appendChild(card));
+        }
+    });
+</script>
+{% endblock %}

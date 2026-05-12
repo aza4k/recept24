@@ -1,0 +1,203 @@
+{% extends 'search/base.html' %}
+
+{% block title %}{{ medicine.name }} - Recept24{% endblock %}
+
+{% block extra_css %}
+    .detail-card {
+        padding: 50px;
+        border-radius: 40px;
+        margin: 40px auto;
+        max-width: 900px;
+    }
+
+    .detail-header {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 40px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .detail-icon {
+        font-size: 80px;
+        width: 150px;
+        height: 150px;
+        background-color: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 30px;
+    }
+
+    .detail-title h1 {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .detail-price {
+        font-size: 32px;
+        font-weight: bold;
+        color: var(--green-light);
+    }
+
+    .detail-info {
+        margin-bottom: 40px;
+    }
+
+    .detail-info h3 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: var(--green-light);
+    }
+
+    .detail-info p {
+        font-size: 18px;
+        line-height: 1.6;
+        color: var(--text-muted);
+    }
+
+    /* Pharmacy List */
+    .pharmacy-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .pharmacy-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .pharmacy-item:hover {
+        transform: translateX(5px);
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(46, 204, 113, 0.4);
+    }
+    
+    .pharmacy-item.cheapest {
+        border-color: var(--green-light);
+        background-color: rgba(46, 204, 113, 0.1);
+    }
+
+    .pharm-details h4 {
+        font-size: 20px;
+        margin-bottom: 5px;
+        color: var(--text-main);
+    }
+
+    .pharm-details p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+    }
+
+    .pharm-price {
+        text-align: right;
+    }
+
+    .pharm-price .price {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--green-light);
+        display: block;
+    }
+    
+    .cheapest-badge {
+        font-size: 12px;
+        background-color: var(--green-mid);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 10px;
+        margin-top: 5px;
+        display: inline-block;
+    }
+
+    .back-btn {
+        display: inline-block;
+        padding: 15px 30px;
+        background-color: rgba(255,255,255,0.1);
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-top: 30px;
+        transition: background-color 0.3s;
+    }
+
+    .back-btn:hover {
+        background-color: rgba(255,255,255,0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .detail-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        .detail-card {
+            padding: 30px;
+            margin: 20px;
+        }
+        .pharmacy-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .pharm-price {
+            text-align: left;
+        }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="glass-panel detail-card">
+        <div class="detail-header">
+            <div class="detail-icon">💊</div>
+            <div class="detail-title">
+                <h1>{{ medicine.name }}</h1>
+                <div class="detail-price">Boshlanlang'ich narx: {{ medicine.min_price }} so'm</div>
+            </div>
+        </div>
+
+        <div class="detail-info">
+            <h3>Tavsif</h3>
+            <p>{{ medicine.description }}</p>
+            <p style="margin-top: 10px; font-size: 15px;"><strong>Ishlab chiqaruvchi:</strong> {{ medicine.manufacturer }}</p>
+        </div>
+
+        <div class="detail-info">
+            <h3>Nukus shahridagi dorixonalar va narxlar</h3>
+            <div class="pharmacy-list">
+                {% for stock in medicine.stocks.all %}
+                <div class="pharmacy-item {% if forloop.first %}cheapest{% endif %}">
+                    <div class="pharm-details">
+                        <h4>{{ stock.pharmacy.name }}</h4>
+                        <p>📍 {{ stock.pharmacy.address }}</p>
+                        <p>📞 {{ stock.pharmacy.phone }}</p>
+                    </div>
+                    <div class="pharm-price">
+                        <span class="price">{{ stock.price }} so'm</span>
+                        {% if forloop.first %}
+                            <span class="cheapest-badge">Eng arzon narx!</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p>Ushbu dori hozircha birorta dorixonada mavjud emas.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="{% url 'index' %}" class="back-btn">Ortga qaytish</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
