@@ -210,10 +210,10 @@ class _SearchTabState extends State<_SearchTab> with TickerProviderStateMixin {
                   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                   child: const Icon(Icons.grid_view_rounded, color: Colors.white, size: 22),
                 ),
-                const Column(
+                Column(
                   children: [
-                    Text('Recept24', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: -0.5)),
-                    Text('Нөкис қаласы', style: TextStyle(fontSize: 11, color: Colors.white70)),
+                    Image.asset('assets/logo.png', height: 40, fit: BoxFit.contain), // Custom logo
+                    const Text('Нөкис қаласы', style: TextStyle(fontSize: 11, color: Colors.white70)),
                   ],
                 ),
                 Container(
