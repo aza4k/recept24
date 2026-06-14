@@ -19,6 +19,16 @@ A full-stack medicine search platform built for Uzbekistan — search drugs acro
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+  <img src="screenshots/1.jpg" width="250"/>
+  <img src="screenshots/2.jpg" width="250"/>
+  <img src="screenshots/3.jpg" width="250"/>
+</div>
+
+---
+
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
@@ -208,5 +218,6 @@ MIT © [aza4k](https://github.com/aza4k)
 ---
 
 <div align="center">
-Built for the Uzbekistan healthcare ecosystem · Nukus, Karakalpakstan
+  Developed by <b>fundev.uz</b> Team <br/>
+  Built for the Uzbekistan healthcare ecosystem · Nukus, Karakalpakstan
 </div>
