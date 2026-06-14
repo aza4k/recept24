@@ -218,6 +218,6 @@ MIT © [aza4k](https://github.com/aza4k)
 ---
 
 <div align="center">
-  Developed by <b>fundev.uz</b> Team <br/>
-  Built for the Uzbekistan healthcare ecosystem · Nukus, Karakalpakstan
+  Developed by <b><a href="https://fundev.uz">fundev</a></b> Team <br/>
+  Built for the Karakalpakstan healthcare ecosystem · Nukus
 </div>
