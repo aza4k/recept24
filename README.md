@@ -8,7 +8,7 @@ A full-stack medicine search platform built for Uzbekistan — search drugs acro
 
 <br/>
 
-[![Build](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square&logo=githubactions&logoColor=white)](https://github.com)
+[![Build](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/aza4k/recept24)
 [![Django](https://img.shields.io/badge/Django-5.x-092E20?style=flat-square&logo=django&logoColor=white)](https://djangoproject.com)
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
@@ -18,15 +18,6 @@ A full-stack medicine search platform built for Uzbekistan — search drugs acro
 </div>
 
 ---
-
-## 📸 Screenshots
-
-<div align="center">
-  <img src="screenshots/1.jpg" width="250"/>
-  <img src="screenshots/2.jpg" width="250"/>
-  <img src="screenshots/3.jpg" width="250"/>
-</div>
-
 
 ## 📋 Table of Contents
 
@@ -44,7 +35,7 @@ A full-stack medicine search platform built for Uzbekistan — search drugs acro
 
 ## 🔍 Overview
 
-**Recept24** solves a daily frustration: going from pharmacy to pharmacy to find a specific drug. Users search by medicine name or active ingredient, pick multiple items, and the platform instantly finds the **nearest pharmacy that stocks all of them** at the best combined price.
+**Recept24** solves a daily frustration: going from pharmacy to pharmacy to find a specific drug. Users search by medicine name, pick multiple items, and the platform instantly finds the **pharmacies that stock all of them** at the best combined price.
 
 **Core user flow:**
 
@@ -58,7 +49,7 @@ Search medicine → Add to basket → System finds optimal pharmacy → Navigate
 
 ## 🏗 Architecture
 
-Recept24 follows a **Decoupled Architecture**: a Django REST backend acts as the data and logic engine, while a Flutter client app handles all UI and user interaction. The two communicate exclusively through a JSON API.
+Recept24 follows a **Decoupled Architecture**: a Django backend acts as the data and logic engine, while a Flutter client app handles all UI and user interaction. The two communicate via JSON API.
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -93,14 +84,15 @@ Recept24 follows a **Decoupled Architecture**: a Django REST backend acts as the
 Three core models power the entire platform (`search/models.py`):
 
 ### `Medicine`
-Stores the drug catalog with AI-generated descriptions.
+Stores the drug catalog with detailed descriptions.
 
 | Field | Type | Description |
 |---|---|---|
 | `name` | CharField | Drug name |
-| `active_ingredient` | CharField | Active compound |
-| `description` | TextField | AI-generated description |
-| `image` | ImageField | Drug photo |
+| `description` | TextField | Detailed description |
+| `manufacturer` | CharField | Producing company |
+| `image_url` | URLField | Link to drug photo |
+| `category` | CharField | Medicine category (e.g. Tablets) |
 
 ### `Pharmacy`
 Stores pharmacy locations with GPS coordinates.
@@ -109,12 +101,13 @@ Stores pharmacy locations with GPS coordinates.
 |---|---|---|
 | `name` | CharField | Pharmacy name |
 | `address` | CharField | Street address |
+| `phone` | CharField | Contact number |
 | `latitude` | FloatField | GPS latitude |
 | `longitude` | FloatField | GPS longitude |
-| `working_hours` | CharField | Opening hours |
+| `work_hours` | CharField | Opening hours |
 
 ### `MedicineStock`
-The Many-to-Many bridge — which pharmacy has which drug and at what price.
+The Many-to-Many bridge — linking pharmacies to medicine availability.
 
 | Field | Type | Description |
 |---|---|---|
@@ -127,45 +120,25 @@ The Many-to-Many bridge — which pharmacy has which drug and at what price.
 
 ## 📡 API Reference
 
-All endpoints are defined in `config/urls.py` → `search/urls.py`.
+All endpoints are reachable under the root URL.
 
 Base URL: `https://your-app.railway.app/api/`
 
-| Method | Endpoint | View | Description |
-|---|---|---|---|
-| `GET` | `/medicines/search/?q=` | `api_search_medicines` | Search medicines by name |
-| `GET` | `/medicines/<id>/` | `api_medicine_detail` | Single medicine detail |
-| `POST` | `/pharmacies/search/` | `api_search_pharmacies` | **Smart search** — find optimal pharmacy for a basket of medicines |
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/search/?q=` | Search medicines (autocomplete) |
+| `GET` | `/api/search-pharmacies/?m=1&m=2` | **Smart search** — find pharmacies with selected medicines |
+| `GET` | `/api/medicines/` | List all medications |
+| `GET` | `/api/pharmacies/` | List all pharmacies |
+| `GET` | `/api/medicine/<id>/` | Detailed medicine profile |
 
-### Smart Search Algorithm (`api_search_pharmacies`)
+### Smart Search Logic (`api_search_pharmacies`)
 
-The core of the platform. When a user selects multiple medicines:
-
-1. Receives a list of `medicine_id`s and the user's `latitude`/`longitude`
-2. Queries `MedicineStock` to find pharmacies that stock **all** selected medicines
-3. Ranks results by **distance** (Haversine formula) and **total price**
-4. Returns ranked pharmacy list with combined price and distance
-
-```json
-// POST /api/pharmacies/search/
-{
-  "medicines": [1, 4, 7],
-  "latitude": 42.4611,
-  "longitude": 59.6168
-}
-
-// Response
-{
-  "results": [
-    {
-      "pharmacy": { "id": 3, "name": "Shifо Dorixona", "address": "...", "lat": ..., "lng": ... },
-      "total_price": 45000,
-      "distance_km": 0.8,
-      "items": [...]
-    }
-  ]
-}
-```
+The core engine:
+1. Receives multiple `m` (medicine ID) parameters.
+2. Filters pharmacies that stock **all** selected items using Django's `Count` and `Q` expressions.
+3. Calculates `total_price` for each valid pharmacy.
+4. Returns results sorted by **lowest total price**.
 
 ---
 
@@ -174,155 +147,63 @@ The core of the platform. When a user selects multiple medicines:
 | Layer | Technology | Role |
 |---|---|---|
 | **Backend language** | Python 3.11+ | Core runtime |
-| **Web framework** | Django 5.x | ORM, views, routing |
-| **Database (dev)** | SQLite | Local development |
-| **Database (prod)** | PostgreSQL | Production-ready |
+| **Web framework** | Django 5.x | ORM, logic, routing |
+| **Database** | SQLite (dev) / PostgreSQL (prod) | Data storage |
 | **App server** | Gunicorn | WSGI server |
-| **Static files** | Whitenoise | Serves assets without Nginx |
-| **Frontend** | Flutter 3.x + Dart | Cross-platform mobile & web |
-| **Maps** | google_maps_flutter | Pharmacy markers & navigation |
-| **Hosting** | Railway | Backend deployment |
-| **CI/CD** | Procfile + railway.json | Auto-deploy on push |
+| **Static files** | Whitenoise | Asset management |
+| **Frontend** | Flutter 3.x + Dart | Cross-platform mobile UI |
+| **Maps** | google_maps_flutter | Geo-location & visualization |
+| **Hosting** | Railway | Cloud deployment |
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Python `3.11+`
-- Flutter `3.x` → [Install Guide](https://docs.flutter.dev/get-started/install)
-- Git
-
----
-
-### Backend Setup (Django)
+### Backend Setup
 
 ```bash
-# 1. Clone
-git clone https://github.com/yourusername/recept24.git
+# 1. Clone & Enter
+git clone https://github.com/aza4k/recept24.git
 cd recept24
 
 # 2. Virtual environment
 python -m venv venv
-source venv/bin/activate        # Linux / macOS
-# venv\Scripts\activate         # Windows
+source venv/bin/activate # Windows: venv\Scripts\activate
 
-# 3. Install dependencies
+# 3. Install
 pip install -r requirements.txt
 
-# 4. Environment variables
-cp .env.example .env
-# Fill in your values (see section below)
-
-# 5. Migrate
+# 4. Initialize Database
 python manage.py migrate
-
-# 6. Seed database with Nukus pharmacies & medicines
 python seed.py
 
-# 7. Run
+# 5. Run
 python manage.py runserver
-# → http://127.0.0.1:8000/
 ```
 
----
-
-### Frontend Setup (Flutter)
+### Frontend Setup
 
 ```bash
-# 1. Enter Flutter project
 cd recept24_app
-
-# 2. Install packages
 flutter pub get
 
-# 3. Set API base URL in lib/services/api_service.dart
-#    const String baseUrl = 'http://127.0.0.1:8000/api/';  ← dev
-#    const String baseUrl = 'https://yourapp.railway.app/api/'; ← prod
+# Configure API URL in lib/services/api_service.dart
+# static const String baseUrl = 'http://127.0.0.1:8000';
 
-# 4. Run
-flutter run             # Android / iOS
-flutter run -d chrome   # Web
+flutter run
 ```
-
----
-
-## 🔑 Environment Variables
-
-Create `.env` in the backend root:
-
-```env
-SECRET_KEY=your-django-secret-key
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-# Switch to PostgreSQL for production:
-DATABASE_URL=sqlite:///db.sqlite3
-
-# Required for pharmacy map features:
-GOOGLE_MAPS_API_KEY=your-google-maps-key
-```
-
-> `db.sqlite3`, `.env`, and `venv/` are all listed in `.gitignore` — never committed.
 
 ---
 
 ## ☁️ Deployment
 
-Configured for **Railway** out of the box via `Procfile` and `railway.json`.
-
-```bash
-# Procfile
-web: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
-```
-
-**Production checklist:**
-
-- [ ] `DEBUG=False`
-- [ ] `ALLOWED_HOSTS` set to Railway domain
-- [ ] Strong unique `SECRET_KEY` in Railway environment variables
-- [ ] `DATABASE_URL` pointing to Railway PostgreSQL
-- [ ] HTTPS enabled (Railway handles this automatically)
-
----
-
-## 📁 Project Structure
-
-```
-recept24/
-│
-├── config/                     # Django project config
-│   ├── settings.py
-│   ├── urls.py                 # Root URL routing
-│   └── wsgi.py
-│
-├── search/                     # Core app
-│   ├── models.py               # Medicine, Pharmacy, MedicineStock
-│   ├── views.py                # Smart search logic + REST API
-│   ├── urls.py                 # API endpoint routing
-│   └── serializers.py
-│
-├── seed.py                     # Seeds Nukus pharmacies & medicines
-├── requirements.txt
-├── Procfile                    # Railway deployment
-├── railway.json
-│
-└── recept24_app/               # Flutter app
-    └── lib/
-        ├── main.dart
-        ├── screens/            # UI screens
-        ├── widgets/            # Reusable components
-        ├── services/
-        │   └── api_service.dart  # All HTTP calls in one place
-        └── models/             # Dart data models
-```
+Pre-configured for **Railway** via `Procfile` and `railway.json`. The system automatically handles migrations and data seeding on each deploy.
 
 ---
 
 ## 📄 License
 
-MIT © [Your Name](https://github.com/yourusername)
+MIT © [aza4k](https://github.com/aza4k)
 
 ---
 
