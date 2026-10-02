@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'https://lol-production-09d7.up.railway.app';
+  static const String baseUrl = 'https://web-production-13565.up.railway.app';
 
   /// Dori nomini qidirish (autocomplete)
   static Future<List<Map<String, dynamic>>> searchMedicines(String query) async {
