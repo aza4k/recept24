@@ -3,7 +3,47 @@ from django.http import JsonResponse
 from django.db.models import Count, Q
 from .models import Medicine, Pharmacy, MedicineStock
 
+def check_and_seed_db():
+    try:
+        if Medicine.objects.count() == 0 or Pharmacy.objects.count() == 0:
+            from django.core.management import call_command
+            call_command('migrate', interactive=False)
+            import seed
+            seed.run_seed()
+    except Exception:
+        try:
+            from django.core.management import call_command
+            call_command('migrate', interactive=False)
+            import seed
+            seed.run_seed()
+        except Exception:
+            pass
+
+def api_init_db(request):
+    import traceback
+    from io import StringIO
+    from django.core.management import call_command
+    out = StringIO()
+    try:
+        call_command('migrate', interactive=False, stdout=out)
+        import seed
+        seed.run_seed()
+        return JsonResponse({
+            'status': 'success',
+            'medicines_count': Medicine.objects.count(),
+            'pharmacies_count': Pharmacy.objects.count(),
+            'migrate_output': out.getvalue(),
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'error': str(e),
+            'traceback': traceback.format_exc(),
+            'migrate_output': out.getvalue(),
+        }, status=500)
+
 def index(request):
+    check_and_seed_db()
     medicine_ids = request.GET.getlist('m')
     pharmacies_data = []
     selected_medicines = []
@@ -39,6 +79,7 @@ def index(request):
 
 def api_search_medicines(request):
     """Dori nomini qidirish (autocomplete)"""
+    check_and_seed_db()
     q = request.GET.get('q', '')
     if q:
         medicines = Medicine.objects.filter(name__icontains=q)[:10]
@@ -96,6 +137,7 @@ def api_search_pharmacies(request):
 
 def api_all_pharmacies(request):
     """Barcha dorixonalar ro'yxati"""
+    check_and_seed_db()
     pharmacies = Pharmacy.objects.all()
     data = [{
         'id': p.id,
@@ -110,6 +152,7 @@ def api_all_pharmacies(request):
 
 def api_all_medicines(request):
     """Barcha dorilar ro'yxati (alfavit bo'yicha)"""
+    check_and_seed_db()
     medicines = Medicine.objects.all().order_by('name')
     data = [{
         'id': m.id,

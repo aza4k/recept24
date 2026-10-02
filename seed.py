@@ -21,13 +21,14 @@ pharmacies_data = [
     {"name": "Бес қала мед", "address": "Нөкис қаласы", "phone": "", "latitude": 42.4722161, "longitude": 59.6030338, "work_hours": "07:00-23:00"},
 ]
 
-pharmacies = []
-for p_data in pharmacies_data:
-    p, _ = Pharmacy.objects.update_or_create(
-        name=p_data['name'],
-        defaults=p_data
-    )
-    pharmacies.append(p)
+def run_seed():
+    pharmacies = []
+    for p_data in pharmacies_data:
+        p, _ = Pharmacy.objects.update_or_create(
+            name=p_data['name'],
+            defaults=p_data
+        )
+        pharmacies.append(p)
 
 # Create Medicines with images, categories and detailed AI descriptions
 medicines_data = [
@@ -153,25 +154,30 @@ medicines_data = [
     },
 ]
 
-for m_data in medicines_data:
-    base_price = m_data.pop('base_price')
-    medicine, created = Medicine.objects.update_or_create(
-        name=m_data['name'],
-        defaults=m_data
-    )
-    
-    if created or not medicine.stocks.exists():
-        num_pharms = random.randint(3, len(pharmacies))
-        selected_pharms = random.sample(pharmacies, num_pharms)
+    for m_data in medicines_data:
+        m_copy = dict(m_data)
+        base_price = m_copy.pop('base_price', 10000)
+        medicine, created = Medicine.objects.update_or_create(
+            name=m_copy['name'],
+            defaults=m_copy
+        )
         
-        for pharm in selected_pharms:
-            variation = random.uniform(0.9, 1.15)
-            price = round(base_price * variation, -2) # round to nearest 100
+        if created or not medicine.stocks.exists():
+            num_pharms = random.randint(3, len(pharmacies))
+            selected_pharms = random.sample(pharmacies, num_pharms)
             
-            MedicineStock.objects.update_or_create(
-                medicine=medicine,
-                pharmacy=pharm,
-                defaults={'price': price, 'in_stock': True}
-            )
+            for pharm in selected_pharms:
+                variation = random.uniform(0.9, 1.15)
+                price = round(base_price * variation, -2) # round to nearest 100
+                
+                MedicineStock.objects.update_or_create(
+                    medicine=medicine,
+                    pharmacy=pharm,
+                    defaults={'price': price, 'in_stock': True}
+                )
 
-print(f"Successfully processed {len(medicines_data)} medicines and {len(pharmacies_data)} pharmacies!")
+    print(f"Successfully processed {len(medicines_data)} medicines and {len(pharmacies_data)} pharmacies!")
+
+if __name__ == '__main__':
+    run_seed()
+

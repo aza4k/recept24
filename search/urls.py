@@ -8,7 +8,7 @@ urlpatterns = [
     path('api/pharmacies/', views.api_all_pharmacies, name='api_all_pharmacies'),
     path('api/medicines/', views.api_all_medicines, name='api_all_medicines'),
     path('api/medicine/<int:medicine_id>/', views.api_medicine_detail, name='api_medicine_detail'),
-    path('medicine/<int:medicine_id>/', views.detail, name='detail'),
+    path('api/init-db/', views.api_init_db, name='api_init_db'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
 ]
