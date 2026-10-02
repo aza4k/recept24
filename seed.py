@@ -21,15 +21,6 @@ pharmacies_data = [
     {"name": "Бес қала мед", "address": "Нөкис қаласы", "phone": "", "latitude": 42.4722161, "longitude": 59.6030338, "work_hours": "07:00-23:00"},
 ]
 
-def run_seed():
-    pharmacies = []
-    for p_data in pharmacies_data:
-        p, _ = Pharmacy.objects.update_or_create(
-            name=p_data['name'],
-            defaults=p_data
-        )
-        pharmacies.append(p)
-
 # Create Medicines with images, categories and detailed AI descriptions
 medicines_data = [
     {
@@ -153,6 +144,15 @@ medicines_data = [
         "base_price": 22000
     },
 ]
+
+def run_seed():
+    pharmacies = []
+    for p_data in pharmacies_data:
+        p, _ = Pharmacy.objects.update_or_create(
+            name=p_data['name'],
+            defaults=p_data
+        )
+        pharmacies.append(p)
 
     for m_data in medicines_data:
         m_copy = dict(m_data)
