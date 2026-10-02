@@ -410,14 +410,14 @@
 
 {% block content %}
     <header class="hero">
-        <h1>Dorilarni izlash va taqqoslash</h1>
-        <p>Istalgan dorilarni kiriting va eng arzon takliflarni toping</p>
+        <h1 data-i18n="hero_title">Dori-darmonlarni arzon va tez toping</h1>
+        <p data-i18n="hero_sub">Nukus shahridagi barcha dorixonalar bo'yicha yagona qidiruv tizimi</p>
         
         <div class="search-wrapper">
             <form method="GET" action="{% url 'index' %}" id="search-form" class="search-form">
                 <div class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
-                <input type="text" id="search-input" class="search-input" placeholder="Dori nomini kiriting..." autocomplete="off">
-                <button type="submit" class="search-btn">Qidirish</button>
+                <input type="text" id="search-input" class="search-input" data-i18n-ph="search_ph" placeholder="Dori nomini kiriting..." autocomplete="off">
+                <button type="submit" class="search-btn" data-i18n="search_btn">Qidirish</button>
                 <div id="selected-medicines-inputs">
                     {% for med in selected_medicines %}
                         <input type="hidden" name="m" value="{{ med.id }}">
@@ -436,15 +436,15 @@
 
             <div class="section-header">
                 <div>
-                    <h2 class="section-title">Topilgan dorixonalar</h2>
+                    <h2 class="section-title" data-i18n="found_title">Topilgan dorixonalar</h2>
                     <span class="results-count">{{ pharmacies_data|length }} ta natija</span>
                 </div>
                 <div class="sort-tabs">
                     <button class="sort-tab active" id="sort-cheap" onclick="sortBy('cheap')">
-                        <i class="fa-solid fa-tag"></i> Arzonroq
+                        <i class="fa-solid fa-tag"></i> <span data-i18n="sort_cheap">Arzonroq</span>
                     </button>
                     <button class="sort-tab" id="sort-near" onclick="sortBy('near')">
-                        <i class="fa-solid fa-location-crosshairs"></i> Yaqinroq
+                        <i class="fa-solid fa-location-crosshairs"></i> <span data-i18n="sort_near">Yaqinroq</span>
                     </button>
                 </div>
             </div>
@@ -470,10 +470,10 @@
                             <div class="total-price">{{ item.total_price|floatformat:0 }} so'm</div>
                             <div class="pharm-actions">
                                 <a href="tel:{{ item.pharmacy.phone }}" class="action-btn call-btn">
-                                    <i class="fa-solid fa-phone"></i> Qo'ng'iroq
+                                    <i class="fa-solid fa-phone"></i> <span data-i18n="btn_call">Qo'ng'iroq</span>
                                 </a>
                                 <a href="https://yandex.uz/maps/?pt={{ item.lng }},{{ item.lat }}&z=17&l=map" target="_blank" class="action-btn map-btn">
-                                    <i class="fa-solid fa-map-location-dot"></i> Xaritada
+                                    <i class="fa-solid fa-map-location-dot"></i> <span data-i18n="btn_map">Xaritada</span>
                                 </a>
                             </div>
                         </div>
@@ -482,7 +482,7 @@
                     <div class="pharm-medicines">
                         {% for stock in item.stocks %}
                         <div class="stock-item">
-                            <span class="stock-name"><i class="fa-solid fa-check"></i> {{ stock.medicine.name }} <span style="color:var(--text-muted); font-size:12px;">({{ stock.medicine.manufacturer }})</span></span>
+                            <span class="stock-name"><i class="fa-solid fa-check"></i> {{ stock.medicine.name }} <span style="color:var(--text-muted); font-size:12px;">• {{ stock.medicine.manufacturer }}</span></span>
                             <span class="stock-price">{{ stock.price|floatformat:0 }} so'm</span>
                         </div>
                         {% endfor %}
@@ -491,16 +491,16 @@
                 {% empty %}
                 <div class="empty-state">
                     <i class="fa-solid fa-box-open empty-icon"></i>
-                    <h3>Dorixona topilmadi</h3>
-                    <p>Ushbu ro'yxatdagi barcha dorilar birdaniga mavjud bo'lgan dorixona topilmadi.</p>
+                    <h3 data-i18n="empty_no_pharm">Dorixona topilmadi</h3>
+                    <p data-i18n="empty_no_pharm_desc">Ushbu ro'yxatdagi barcha dorilar birdaniga mavjud bo'lgan dorixona topilmadi.</p>
                 </div>
                 {% endfor %}
             </div>
         {% else %}
             <div class="empty-state">
                 <i class="fa-solid fa-pills empty-icon"></i>
-                <h3>Ro'yxat bo'sh</h3>
-                <p>Qidiruvni boshlash uchun yuqoridagi maydonga dori nomini yozing.</p>
+                <h3 data-i18n="empty_title">Ro'yxat bo'sh</h3>
+                <p data-i18n="empty_desc">Qidiruvni boshlash uchun yuqoridagi maydonga dori nomini yozing.</p>
             </div>
         {% endif %}
     </main>

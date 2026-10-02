@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #059669; /* Richer, darker green */
+            --primary: #059669;
             --primary-dark: #047857;
-            --navbar-bg: #064e3b; /* Dark emerald for navbar */
-            --bg-color: #f1f5f9; /* Slightly darker gray for background */
+            --navbar-bg: #064e3b;
+            --bg-color: #f1f5f9;
             --white: #ffffff;
-            --text-main: #0f172a; /* Slate 900 */
-            --text-muted: #475569; /* Slate 600 */
-            --border-color: #cbd5e1; /* Slate 300 */
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #cbd5e1;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.15), 0 2px 4px -1px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.15), 0 4px 6px -2px rgba(0,0,0,0.1);
@@ -60,22 +60,62 @@
             gap: 10px;
         }
 
+        .nav-right-group {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
         .nav-links {
             display: flex;
-            gap: 25px;
+            gap: 22px;
             list-style: none;
         }
 
         .nav-links a {
             color: #e2e8f0;
             text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 14.5px;
+            font-weight: 600;
             transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .nav-links a:hover, .nav-links a.active {
             color: #6ee7b7;
+        }
+
+        .web-lang-switcher {
+            display: inline-flex;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .web-lang-btn {
+            border: none;
+            background: transparent;
+            color: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .web-lang-btn:hover {
+            color: #ffffff;
+        }
+
+        .web-lang-btn.active {
+            background: #ffffff;
+            color: var(--navbar-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
         .content-wrapper {
@@ -118,11 +158,18 @@
         <a href="{% url 'index' %}" class="logo">
             <i class="fa-solid fa-pills"></i> Recept24
         </a>
-        <ul class="nav-links">
-            <li><a href="{% url 'index' %}"><i class="fa-solid fa-house"></i> Bosh sahifa</a></li>
-            <li><a href="{% url 'about' %}"><i class="fa-solid fa-circle-info"></i> Loyiha haqida</a></li>
-            <li><a href="{% url 'contact' %}"><i class="fa-solid fa-envelope"></i> Aloqa</a></li>
-        </ul>
+        <div class="nav-right-group">
+            <ul class="nav-links">
+                <li><a href="{% url 'index' %}" id="nav-link-home"><i class="fa-solid fa-house"></i> <span data-i18n="nav_home">Bosh sahifa</span></a></li>
+                <li><a href="{% url 'about' %}" id="nav-link-about"><i class="fa-solid fa-circle-info"></i> <span data-i18n="nav_about">Loyiha haqida</span></a></li>
+                <li><a href="{% url 'contact' %}" id="nav-link-contact"><i class="fa-solid fa-envelope"></i> <span data-i18n="nav_contact">Aloqa</span></a></li>
+            </ul>
+            <div class="web-lang-switcher">
+                <button class="web-lang-btn" data-lang="kaa" onclick="setWebLang('kaa')">QR</button>
+                <button class="web-lang-btn" data-lang="uz" onclick="setWebLang('uz')">UZ</button>
+                <button class="web-lang-btn" data-lang="ru" onclick="setWebLang('ru')">RU</button>
+            </div>
+        </div>
     </nav>
 
     <div class="content-wrapper">
@@ -130,8 +177,173 @@
     </div>
 
     <footer class="footer">
-        <p>&copy; 2026 Recept24 - Barcha huquqlar himoyalangan.</p>
+        <p><span data-i18n="footer_rights">&copy; 2026 Recept24 - Barcha huquqlar himoyalangan.</span></p>
         <p>Email: info@recept24.uz | Telefon: +998 90 123 45 67</p>
     </footer>
+
+    <script>
+        const WEB_I18N = {
+            kaa: {
+                nav_home: "Бас бет",
+                nav_about: "Жойбар ҳаққында",
+                nav_contact: "Байланыс",
+                footer_rights: "© 2026 Recept24 - Барлық ҳуқықлар қорғалған.",
+                hero_title: "Дәри-дәрмақларды арзан ҳәм тез табың",
+                hero_sub: "Нөкис қаласындағы барлық дәриханалар бойынша бирден-бир излеў системасы",
+                search_ph: "Дәри атамасын киритиң...",
+                search_btn: "Излеў",
+                found_title: "Табылған дәриханалар",
+                sort_cheap: "Арзанлаў",
+                sort_near: "Жақынлаў",
+                btn_call: "Қоңыраў",
+                btn_map: "Картада",
+                empty_no_pharm: "Дәрихана табылмады",
+                empty_no_pharm_desc: "Усы дизимдеги барлық дәрилер бирден бар болған дәрихана табылмады.",
+                empty_title: "Дизим бос",
+                empty_desc: "Излеўди баслаў ушын жоқарыдағы майданға дәри атамасын жазың.",
+                currency: "сўм",
+                about_title: "Recept24 ҳаққында",
+                about_desc1: "Recept24 – дәри қураллары бойынша ең тез ҳәм исенимли излеў системасы. Биз пайдаланыўшыларға дәрилер баҳасын ҳәм мағлыўматын оңай табыўы ушын заманагөй, қолайлы ҳәм қәўипсиз платформа усынамыз.",
+                about_desc2: "Бизлердиң мақсетимиз халықты исенимли мәлимлеме менен тәмийинлеў ҳәм денсаўлықты сақлаў тараўына санлы инновацияларды енгизиў.",
+                about_f1_title: "Тез излеў",
+                about_f1_desc: "Мыңлаған дәрилер базасынан өзиңизге кереклисин тез табыў имканияты.",
+                about_f2_title: "Исенимли сапа",
+                about_f2_desc: "Мағлыўматлар тек рәсмий рухсатқа ийе ҳәм лицензияланған дәреклерден алынады.",
+                about_f3_title: "Қолайлы дизайн",
+                about_f3_desc: "Сиз ушын көзди шаршатпайтуғын қолайлы ҳәм заманагөй интерфейс жаратылған.",
+                about_f4_title: "Анық баҳалар",
+                about_f4_desc: "Дәриханалардағы әмелдеги баҳаларды турақлы түрде жаңалап турамыз.",
+                contact_title: "Биз бенен байланыс",
+                contact_subtitle: "Сораўларыңыз бар ма яки усыныс билдирмекшисиз бе? Төмендеги мағлыўматлар арқалы байланысың.",
+                contact_addr_label: "Мәнзил",
+                contact_addr_val: "Нөкис қаласы",
+                contact_phone_label: "Телефон",
+                contact_email_label: "Электрон почта",
+                contact_form_title: "Хабар жибериў",
+                contact_form_name: "Аты-фамилияңыз",
+                contact_ph_name: "Атыңызды киритиң",
+                contact_form_email: "Электрон почтаңыз",
+                contact_form_msg: "Хабар тексти",
+                contact_ph_msg: "Хабарыңызды усы жерге жазың...",
+                contact_btn_send: "Жибериў"
+            },
+            uz: {
+                nav_home: "Bosh sahifa",
+                nav_about: "Loyiha haqida",
+                nav_contact: "Aloqa",
+                footer_rights: "© 2026 Recept24 - Barcha huquqlar himoyalangan.",
+                hero_title: "Dori-darmonlarni arzon va tez toping",
+                hero_sub: "Nukus shahridagi barcha dorixonalar bo'yicha yagona qidiruv tizimi",
+                search_ph: "Dori nomini kiriting...",
+                search_btn: "Qidirish",
+                found_title: "Topilgan dorixonalar",
+                sort_cheap: "Arzonroq",
+                sort_near: "Yaqinroq",
+                btn_call: "Qo'ng'iroq",
+                btn_map: "Xaritada",
+                empty_no_pharm: "Dorixona topilmadi",
+                empty_no_pharm_desc: "Ushbu ro'yxatdagi barcha dorilar birdaniga mavjud bo'lgan dorixona topilmadi.",
+                empty_title: "Ro'yxat bo'sh",
+                empty_desc: "Qidiruvni boshlash uchun yuqoridagi maydonga dori nomini yozing.",
+                currency: "so'm",
+                about_title: "Recept24 haqida",
+                about_desc1: "Recept24 – dori vositalari bo'yicha eng tezkor va ishonchli qidiruv tizimidir. Biz foydalanuvchilarga o'zlariga kerakli dori vositalari narxini va ma'lumotlarini oson topishlari uchun zamonaviy, qulay va xavfsiz platforma taqdim etamiz.",
+                about_desc2: "Bizning maqsadimiz aholini ishonchli ma'lumotlar bilan ta'minlash va sog'liqni saqlash sohasida raqamli innovatsiyalarni joriy etishdir.",
+                about_f1_title: "Tezkor qidiruv",
+                about_f1_desc: "Minglab dorilar bazasidan o'zingizga keraklisini soniyalar ichida topishingiz mumkin.",
+                about_f2_title: "Ishonchli sifat",
+                about_f2_desc: "Ma'lumotlar faqat rasmiy ruxsatga ega va litsenziyalangan manbalardan olinadi.",
+                about_f3_title: "Qulay dizayn",
+                about_f3_desc: "Siz uchun ko'zni toliqtirmaydigan qulay va zamonaviy interfeys yaratilgan.",
+                about_f4_title: "Aniq narxlar",
+                about_f4_desc: "Dorixonalardagi amaldagi narxlarni doimiy tarzda yangilab boramiz.",
+                contact_title: "Biz bilan aloqa",
+                contact_subtitle: "Savollaringiz bormi yoki taklif kiritmoqchimisiz? Quyidagi ma'lumotlar orqali biz bilan bog'laning.",
+                contact_addr_label: "Manzil",
+                contact_addr_val: "Nukus shahri",
+                contact_phone_label: "Telefon",
+                contact_email_label: "Elektron pochta",
+                contact_form_title: "Xabar yuborish",
+                contact_form_name: "To'liq ismingiz",
+                contact_ph_name: "Ismingizni kiriting",
+                contact_form_email: "Elektron pochtangiz",
+                contact_form_msg: "Xabar matni",
+                contact_ph_msg: "Xabaringizni bu yerga yozing...",
+                contact_btn_send: "Yuborish"
+            },
+            ru: {
+                nav_home: "Главная",
+                nav_about: "О проекте",
+                nav_contact: "Контакты",
+                footer_rights: "© 2026 Recept24 - Все права защищены.",
+                hero_title: "Быстрый и выгодный поиск лекарств",
+                hero_sub: "Единая поисковая система по всем аптекам города Нукус",
+                search_ph: "Введите название препарата...",
+                search_btn: "Поиск",
+                found_title: "Найденные аптеки",
+                sort_cheap: "Дешевле",
+                sort_near: "Ближе",
+                btn_call: "Позвонить",
+                btn_map: "На карте",
+                empty_no_pharm: "Аптека не найдена",
+                empty_no_pharm_desc: "Не найдено аптеки, где все выбранные препараты есть в наличии одновременно.",
+                empty_title: "Список пуст",
+                empty_desc: "Чтобы начать поиск, введите название препарата в поле выше.",
+                currency: "сум",
+                about_title: "О сервисе Recept24",
+                about_desc1: "Recept24 – надежная и быстрая система поиска лекарственных препаратов. Мы предоставляем современную платформу для удобного и безопасного поиска цен и информации о медикаментах.",
+                about_desc2: "Наша цель – обеспечение населения достоверной информацией и внедрение цифровых технологий в сфере здравоохранения.",
+                about_f1_title: "Быстрый поиск",
+                about_f1_desc: "Быстрый поиск среди тысяч препаратов в базе данных за считанные секунды.",
+                about_f2_title: "Надежное качество",
+                about_f2_desc: "Информация берется только из официальных и лицензированных аптек.",
+                about_f3_title: "Удобный интерфейс",
+                about_f3_desc: "Создан современный комфортный дизайн, не утомляющий зрение при работе.",
+                about_f4_title: "Актуальные цены",
+                about_f4_desc: "Постоянное и точное обновление цен на лекарства в реальном времени.",
+                contact_title: "Связаться с нами",
+                contact_subtitle: "У вас есть вопросы или предложения? Свяжитесь с нашей командой по указанным контактам.",
+                contact_addr_label: "Адрес",
+                contact_addr_val: "Город Нукус",
+                contact_phone_label: "Телефон",
+                contact_email_label: "Электронная почта",
+                contact_form_title: "Отправить сообщение",
+                contact_form_name: "ФИО",
+                contact_ph_name: "Введите ваше имя",
+                contact_form_email: "Ваш адрес почты",
+                contact_form_msg: "Текст сообщения",
+                contact_ph_msg: "Напишите сообщение здесь...",
+                contact_btn_send: "Отправить"
+            }
+        };
+
+        let currentWebLang = localStorage.getItem('recept24_lang') || 'uz';
+
+        function setWebLang(lang) {
+            if (!WEB_I18N[lang]) return;
+            currentWebLang = lang;
+            localStorage.setItem('recept24_lang', lang);
+            document.querySelectorAll('.web-lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+            applyWebI18n();
+        }
+
+        function applyWebI18n() {
+            const dict = WEB_I18N[currentWebLang] || WEB_I18N.uz;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if (dict[k]) el.innerText = dict[k];
+            });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const k = el.getAttribute('data-i18n-ph');
+                if (dict[k]) el.placeholder = dict[k];
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setWebLang(currentWebLang);
+        });
+    </script>
 </body>
 </html>

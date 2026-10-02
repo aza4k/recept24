@@ -1,0 +1,11 @@
+# Railway deployment ignore
+desktop_app/
+recept24_desktop/
+recept24_app/
+dist/
+build/
+screenshots/
+scratch/
+*.spec
+*.exe
+*.log

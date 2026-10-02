@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/locale_service.dart';
 import 'results_screen.dart';
 import 'medicines_screen.dart';
 import 'map_screen.dart';
@@ -24,9 +25,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: _currentNavIndex, children: _screens),
-      bottomNavigationBar: _buildBottomNav(),
+    return ValueListenableBuilder<String>(
+      valueListenable: LocaleService.currentLang,
+      builder: (context, lang, child) {
+        return Scaffold(
+          body: IndexedStack(index: _currentNavIndex, children: _screens),
+          bottomNavigationBar: _buildBottomNav(),
+        );
+      },
     );
   }
 
@@ -42,9 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _navItem(Icons.search_rounded, 'Излеў', 0),
-              _navItem(Icons.medication_rounded, 'Дәрилер', 1),
-              _navItem(Icons.local_pharmacy_rounded, 'Дәриханалар', 2),
+              _navItem(Icons.search_rounded, LocaleService.t('tab_search'), 0),
+              _navItem(Icons.medication_rounded, LocaleService.t('tab_meds'), 1),
+              _navItem(Icons.local_pharmacy_rounded, LocaleService.t('tab_pharms'), 2),
             ],
           ),
         ),
@@ -147,7 +153,7 @@ class _SearchTabState extends State<_SearchTab> with TickerProviderStateMixin {
   void _search() {
     if (_selectedMedicines.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Row(children: [Icon(Icons.info_outline, color: Colors.white, size: 20), SizedBox(width: 10), Text('Кеминде бир дәри таңлаң')]),
+        content: Row(children: [const Icon(Icons.info_outline, color: Colors.white, size: 20), const SizedBox(width: 10), Text(LocaleService.t('select_min_one'))]),
         backgroundColor: const Color(0xFF2563EB),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -213,13 +219,60 @@ class _SearchTabState extends State<_SearchTab> with TickerProviderStateMixin {
                 Column(
                   children: [
                     Image.asset('assets/logo.png', height: 40, fit: BoxFit.contain), // Custom logo
-                    const Text('Нөкис қаласы', style: TextStyle(fontSize: 11, color: Colors.white70)),
+                    Text(LocaleService.t('city_nukus'), style: const TextStyle(fontSize: 11, color: Colors.white70)),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
-                  child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                      builder: (ctx) => SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListTile(
+                                leading: const Icon(Icons.language, color: Color(0xFF2563EB)),
+                                title: const Text('Қарақалпақша', style: TextStyle(fontWeight: FontWeight.w700)),
+                                trailing: LocaleService.currentLang.value == 'kaa' ? const Icon(Icons.check, color: Color(0xFF2563EB)) : null,
+                                onTap: () { LocaleService.setLang('kaa'); Navigator.pop(ctx); },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.language, color: Color(0xFF2563EB)),
+                                title: const Text('O\'zbekcha', style: TextStyle(fontWeight: FontWeight.w700)),
+                                trailing: LocaleService.currentLang.value == 'uz' ? const Icon(Icons.check, color: Color(0xFF2563EB)) : null,
+                                onTap: () { LocaleService.setLang('uz'); Navigator.pop(ctx); },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.language, color: Color(0xFF2563EB)),
+                                title: const Text('Русский', style: TextStyle(fontWeight: FontWeight.w700)),
+                                trailing: LocaleService.currentLang.value == 'ru' ? const Icon(Icons.check, color: Color(0xFF2563EB)) : null,
+                                onTap: () { LocaleService.setLang('ru'); Navigator.pop(ctx); },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.language_rounded, color: Colors.white, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          LocaleService.currentLang.value == 'kaa' ? 'QR' : LocaleService.currentLang.value.toUpperCase(),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -243,12 +296,12 @@ class _SearchTabState extends State<_SearchTab> with TickerProviderStateMixin {
                         child: const Icon(Icons.receipt_long_rounded, color: Colors.white, size: 24),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(child: Column(
+                      Expanded(child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Рецепт бойынша излеў', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
-                          SizedBox(height: 2),
-                          Text('Бирнеше дәри қосып, ең арзан дәрихананы табың', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                          Text(LocaleService.t('search_banner_title'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                          const SizedBox(height: 2),
+                          Text(LocaleService.t('search_banner_sub'), style: const TextStyle(color: Colors.white70, fontSize: 12)),
                         ],
                       )),
                     ],
@@ -274,7 +327,7 @@ class _SearchTabState extends State<_SearchTab> with TickerProviderStateMixin {
                       onChanged: _onSearchChanged,
                       style: const TextStyle(fontSize: 15),
                       decoration: InputDecoration(
-                        hintText: 'Дәри атамасын киритиң...',
+                        hintText: LocaleService.t('search_ph'),
                         hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
                         border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none,
                         fillColor: Colors.transparent,
@@ -292,12 +345,12 @@ class _SearchTabState extends State<_SearchTab> with TickerProviderStateMixin {
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: [BoxShadow(color: const Color(0xFF2563EB).withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 3))],
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.search, color: Colors.white, size: 18),
-                          SizedBox(width: 4),
-                          Text('Излеў', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                          const Icon(Icons.search, color: Colors.white, size: 18),
+                          const SizedBox(width: 4),
+                          Text(LocaleService.t('btn_find'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
                         ],
                       ),
                     ),

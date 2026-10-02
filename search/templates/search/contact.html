@@ -6,7 +6,7 @@
     .contact-wrapper {
         display: flex;
         flex-wrap: wrap;
-        gap: 50px;
+        gap: 40px;
         max-width: 1000px;
         margin: 40px auto;
     }
@@ -17,105 +17,111 @@
     }
 
     .contact-form-container {
-        flex: 1.5;
+        flex: 1.4;
         min-width: 300px;
         padding: 40px;
-        border-radius: 40px;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        box-shadow: var(--shadow-sm);
     }
 
     .contact-info h1 {
-        font-size: 48px;
-        margin-bottom: 20px;
+        font-size: 36px;
+        margin-bottom: 16px;
+        color: var(--text-main);
+        font-weight: 800;
     }
 
     .contact-info p {
-        font-size: 18px;
+        font-size: 15px;
         color: var(--text-muted);
         line-height: 1.6;
-        margin-bottom: 40px;
+        margin-bottom: 36px;
     }
 
     .info-item {
         display: flex;
         align-items: center;
-        gap: 20px;
-        margin-bottom: 30px;
+        gap: 16px;
+        margin-bottom: 24px;
     }
 
     .info-icon {
-        width: 60px;
-        height: 60px;
-        background-color: rgba(255, 255, 255, 0.1);
+        width: 50px;
+        height: 50px;
+        background-color: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1e40af;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 20px;
-        font-size: 24px;
-        color: var(--green-light);
+        border-radius: 14px;
+        font-size: 18px;
+        flex-shrink: 0;
     }
 
     .info-text h4 {
-        font-size: 18px;
-        margin-bottom: 5px;
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 4px;
         color: var(--text-main);
     }
 
     .info-text span {
         color: var(--text-muted);
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .form-group {
-        margin-bottom: 25px;
+        margin-bottom: 20px;
     }
 
     .form-group label {
         display: block;
-        margin-bottom: 10px;
-        font-weight: 500;
-        color: var(--text-muted);
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
     }
 
     .form-control {
         width: 100%;
-        padding: 15px 20px;
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        color: white;
-        font-size: 16px;
+        padding: 12px 16px;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        color: var(--text-main);
+        font-size: 14px;
         outline: none;
-        transition: border-color 0.3s;
+        transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .form-control:focus {
-        border-color: var(--green-light);
+        border-color: #1e40af;
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12);
     }
 
     textarea.form-control {
-        min-height: 150px;
+        min-height: 120px;
         resize: vertical;
     }
 
     .submit-btn {
         width: 100%;
-        padding: 18px;
-        background-color: var(--green-mid);
+        padding: 14px;
+        background-color: #1e40af;
         color: white;
         border: none;
-        border-radius: 20px;
-        font-size: 18px;
-        font-weight: bold;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
         cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s;
+        transition: background-color 0.2s;
     }
 
     .submit-btn:hover {
-        background-color: var(--green-light);
-    }
-
-    .submit-btn:active {
-        transform: scale(0.98);
+        background-color: #1d4ed8;
     }
 {% endblock %}
 
@@ -123,59 +129,59 @@
 <div class="container">
     <div class="contact-wrapper">
         <div class="contact-info">
-            <h1>Biz bilan aloqa</h1>
-            <p>Savollaringiz bormi yoki taklif kiritmoqchimisiz? Biz siz bilan bog'lanishdan doim xursandmiz. Quyidagi ma'lumotlar orqali biz bilan aloqaga chiqing.</p>
+            <h1 data-i18n="contact_title">Biz bilan aloqa</h1>
+            <p data-i18n="contact_subtitle">Savollaringiz bormi yoki taklif kiritmoqchimisiz? Biz siz bilan bog'lanishdan doim xursandmiz. Quyidagi ma'lumotlar orqali biz bilan aloqaga chiqing.</p>
 
             <div class="info-item">
-                <div class="info-icon">📍</div>
+                <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
                 <div class="info-text">
-                    <h4>Manzil</h4>
-                    <span>Toshkent sh., Yunusobod tumani, 14-daha</span>
+                    <h4 data-i18n="contact_addr_label">Manzil</h4>
+                    <span data-i18n="contact_addr_val">Nukus shahri</span>
                 </div>
             </div>
 
             <div class="info-item">
-                <div class="info-icon">📞</div>
+                <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
                 <div class="info-text">
-                    <h4>Telefon</h4>
+                    <h4 data-i18n="contact_phone_label">Telefon</h4>
                     <span>+998 90 123 45 67</span>
                 </div>
             </div>
 
             <div class="info-item">
-                <div class="info-icon">✉️</div>
+                <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
                 <div class="info-text">
-                    <h4>Email</h4>
+                    <h4 data-i18n="contact_email_label">Email</h4>
                     <span>info@recept24.uz</span>
                 </div>
             </div>
         </div>
 
-        <div class="glass-panel contact-form-container">
-            <h2 style="margin-bottom: 30px;">Xabar yuborish</h2>
+        <div class="contact-form-container">
+            <h2 style="margin-bottom: 24px; font-size: 20px; font-weight: 800; color: var(--text-main);" data-i18n="contact_form_title">Xabar yuborish</h2>
             <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Xabaringiz muvaffaqiyatli yuborildi!');">
                 <div class="form-group">
-                    <label for="name">To'liq ismingiz</label>
-                    <input type="text" id="name" class="form-control" placeholder="Ismingizni kiriting" required>
+                    <label for="name" data-i18n="contact_form_name">To'liq ismingiz</label>
+                    <input type="text" id="name" class="form-control" data-i18n-ph="contact_ph_name" placeholder="Ismingizni kiriting" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="email">Email manzilingiz</label>
+                    <label for="email" data-i18n="contact_form_email">Email manzilingiz</label>
                     <input type="email" id="email" class="form-control" placeholder="example@mail.com" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="message">Xabar matni</label>
-                    <textarea id="message" class="form-control" placeholder="Xabaringizni bu yerga yozing..." required></textarea>
+                    <label for="message" data-i18n="contact_form_msg">Xabar matni</label>
+                    <textarea id="message" class="form-control" data-i18n-ph="contact_ph_msg" placeholder="Xabaringizni bu yerga yozing..." required></textarea>
                 </div>
 
-                <button type="submit" class="submit-btn">Yuborish</button>
+                <button type="submit" class="submit-btn" data-i18n="contact_btn_send">Yuborish</button>
             </form>
         </div>
     </div>
 </div>
 
 <script>
-    document.querySelector('a[href="{% url 'contact' %}"]').classList.add('active');
+    document.getElementById('nav-link-contact')?.classList.add('active');
 </script>
 {% endblock %}

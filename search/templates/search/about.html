@@ -6,97 +6,113 @@
     .about-section {
         max-width: 900px;
         margin: 40px auto;
-        padding: 50px;
-        border-radius: 40px;
+        padding: 50px 30px;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        box-shadow: var(--shadow-sm);
     }
 
     .about-section h1 {
-        font-size: 48px;
+        font-size: 36px;
         margin-bottom: 20px;
         text-align: center;
         color: var(--text-main);
+        font-weight: 800;
     }
 
     .about-section p {
-        font-size: 18px;
+        font-size: 16px;
         line-height: 1.8;
         color: var(--text-muted);
-        margin-bottom: 30px;
+        margin-bottom: 24px;
         text-align: center;
     }
 
     .features-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 30px;
-        margin-top: 50px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+        margin-top: 40px;
     }
 
     .feature-card {
-        padding: 40px 30px;
-        border-radius: 28px;
+        padding: 30px 24px;
+        border-radius: 16px;
         text-align: center;
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: transform 0.3s;
+        background-color: #f8fafc;
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .feature-card:hover {
-        transform: translateY(-5px);
-        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
     }
 
-    .feature-icon {
-        font-size: 50px;
-        margin-bottom: 20px;
+    .feature-icon-box {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        margin: 0 auto 18px;
     }
 
     .feature-card h3 {
-        font-size: 22px;
-        margin-bottom: 15px;
-        color: var(--green-light);
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: var(--text-main);
     }
 
     .feature-card p {
         color: var(--text-muted);
         line-height: 1.6;
-        font-size: 16px;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 0;
     }
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="glass-panel about-section">
-        <h1>Recept24 haqida</h1>
-        <p>Recept24 – O'zbekistondagi dori vositalari bo'yicha eng tezkor va ishonchli qidiruv tizimidir. Biz foydalanuvchilarga o'zlariga kerakli dori vositalari narxini va malumotlarini oson topishlari uchun zamonaviy, qulay va xavfsiz platforma taqdim etamiz.</p>
-        <p>Bizning maqsadimiz aholini ishonchli ma'lumotlar bilan ta'minlash va sog'liqni saqlash sohasida raqamli innovatsiyalarni joriy etishdir.</p>
+    <div class="about-section">
+        <h1 data-i18n="about_title">Recept24 haqida</h1>
+        <p data-i18n="about_desc1">Recept24 – O'zbekistondagi dori vositalari bo'yicha eng tezkor va ishonchli qidiruv tizimidir. Biz foydalanuvchilarga o'zlariga kerakli dori vositalari narxini va ma'lumotlarini oson topishlari uchun zamonaviy, qulay va xavfsiz platforma taqdim etamiz.</p>
+        <p data-i18n="about_desc2">Bizning maqsadimiz aholini ishonchli ma'lumotlar bilan ta'minlash va sog'liqni saqlash sohasida raqamli innovatsiyalarni joriy etishdir.</p>
 
         <div class="features-grid">
             <div class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <h3>Tezkor qidiruv</h3>
-                <p>Minglab dorilar bazasidan o'zingizga keraklisini soniyalar ichida topishingiz mumkin.</p>
+                <div class="feature-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <h3 data-i18n="about_f1_title">Tezkor qidiruv</h3>
+                <p data-i18n="about_f1_desc">Minglab dorilar bazasidan o'zingizga keraklisini soniyalar ichida topishingiz mumkin.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🛡️</div>
-                <h3>Ishonchli sifat</h3>
-                <p>Ma'lumotlar faqat rasmiy ruxsatga ega va litsenziyalangan manbalardan olinadi.</p>
+                <div class="feature-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3 data-i18n="about_f2_title">Ishonchli sifat</h3>
+                <p data-i18n="about_f2_desc">Ma'lumotlar faqat rasmiy ruxsatga ega va litsenziyalangan manbalardan olinadi.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🎨</div>
-                <h3>Premium dizayn</h3>
-                <p>Siz uchun Apple dizayn uslubidagi, ko'zni toliqtirmaydigan qulay interfeys yaratilgan.</p>
+                <div class="feature-icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <h3 data-i18n="about_f3_title">Qulay dizayn</h3>
+                <p data-i18n="about_f3_desc">Siz uchun ko'zni toliqtirmaydigan qulay va zamonaviy interfeys yaratilgan.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">💰</div>
-                <h3>Aniq narxlar</h3>
-                <p>Ishlab chiqaruvchilarning o'rtacha narxlarini doimiy tarzda monitoring qilib boramiz.</p>
+                <div class="feature-icon-box"><i class="fa-solid fa-coins"></i></div>
+                <h3 data-i18n="about_f4_title">Aniq narxlar</h3>
+                <p data-i18n="about_f4_desc">Dorixonalardagi amaldagi narxlarni doimiy tarzda yangilab boramiz.</p>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    document.querySelector('a[href="{% url 'about' %}"]').classList.add('active');
+    document.getElementById('nav-link-about')?.classList.add('active');
 </script>
 {% endblock %}

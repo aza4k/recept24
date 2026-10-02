@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/locale_service.dart';
 
 class MedicinesScreen extends StatefulWidget {
   const MedicinesScreen({super.key});
@@ -81,9 +82,9 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Дәрилер', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
+                Text(LocaleService.t('meds_title'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
                 const SizedBox(height: 4),
-                Text('${_allMedicines.length} дәри базада бар', style: const TextStyle(fontSize: 13, color: Colors.white70)),
+                Text('${_allMedicines.length} ${LocaleService.t('meds_count')}', style: const TextStyle(fontSize: 13, color: Colors.white70)),
                 const SizedBox(height: 16),
                 Container(
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
@@ -92,7 +93,7 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
                     onChanged: (_) => _filter(),
                     style: const TextStyle(fontSize: 15),
                     decoration: InputDecoration(
-                      hintText: 'Дәри излеў...',
+                      hintText: LocaleService.t('meds_search_ph'),
                       hintStyle: TextStyle(color: Colors.grey.shade400),
                       prefixIcon: Icon(Icons.search, color: Colors.grey.shade400),
                       border: InputBorder.none,

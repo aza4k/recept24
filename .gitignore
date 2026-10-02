@@ -177,6 +177,12 @@ xcuserdata/
 # IDEs
 .idea/
 .vscode/
-*.swp
-*.swo
 *.iml
+
+# Client apps & desktop artifacts (kept locally, not on Railway server)
+desktop_app/
+recept24_desktop/
+screenshots/
+scratch/
+logo_dark.png
+*.spec

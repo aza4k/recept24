@@ -4,98 +4,109 @@
 
 {% block extra_css %}
     .detail-card {
-        padding: 50px;
-        border-radius: 40px;
+        padding: 40px;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
         margin: 40px auto;
         max-width: 900px;
+        box-shadow: var(--shadow-sm);
     }
 
     .detail-header {
         display: flex;
         align-items: center;
-        gap: 30px;
-        margin-bottom: 40px;
-        padding-bottom: 30px;
-        border-bottom: 1px solid var(--glass-border);
+        gap: 24px;
+        margin-bottom: 30px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border-color);
     }
 
-    .detail-icon {
-        font-size: 80px;
-        width: 150px;
-        height: 150px;
-        background-color: rgba(255, 255, 255, 0.1);
+    .detail-icon-box {
+        font-size: 36px;
+        width: 80px;
+        height: 80px;
+        background-color: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1e40af;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 30px;
+        border-radius: 18px;
+        flex-shrink: 0;
     }
 
     .detail-title h1 {
-        font-size: 40px;
-        margin-bottom: 10px;
+        font-size: 32px;
+        margin-bottom: 6px;
+        font-weight: 800;
+        color: var(--text-main);
     }
 
     .detail-price {
-        font-size: 32px;
-        font-weight: bold;
-        color: var(--green-light);
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--primary);
     }
 
     .detail-info {
-        margin-bottom: 40px;
+        margin-bottom: 32px;
     }
 
     .detail-info h3 {
-        font-size: 24px;
-        margin-bottom: 20px;
-        color: var(--green-light);
+        font-size: 20px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        color: var(--text-main);
     }
 
     .detail-info p {
-        font-size: 18px;
+        font-size: 15px;
         line-height: 1.6;
         color: var(--text-muted);
     }
 
-    /* Pharmacy List */
     .pharmacy-list {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
     }
 
     .pharmacy-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 20px;
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        transition: transform 0.2s, background-color 0.2s;
+        padding: 16px 20px;
+        background-color: #f8fafc;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        transition: transform 0.2s, border-color 0.2s;
     }
 
     .pharmacy-item:hover {
-        transform: translateX(5px);
-        background-color: rgba(255, 255, 255, 0.1);
-        border-color: rgba(46, 204, 113, 0.4);
+        transform: translateX(4px);
+        border-color: #1e40af;
     }
     
     .pharmacy-item.cheapest {
-        border-color: var(--green-light);
-        background-color: rgba(46, 204, 113, 0.1);
+        border-color: #86efac;
+        background-color: #f0fdf4;
     }
 
     .pharm-details h4 {
-        font-size: 20px;
-        margin-bottom: 5px;
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 4px;
         color: var(--text-main);
     }
 
     .pharm-details p {
-        font-size: 14px;
+        font-size: 13.5px;
         color: var(--text-muted);
         margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .pharm-price {
@@ -103,36 +114,40 @@
     }
 
     .pharm-price .price {
-        font-size: 24px;
-        font-weight: bold;
-        color: var(--green-light);
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--primary);
         display: block;
     }
     
     .cheapest-badge {
-        font-size: 12px;
-        background-color: var(--green-mid);
-        color: white;
+        font-size: 11.5px;
+        font-weight: 700;
+        background-color: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
         padding: 3px 8px;
-        border-radius: 10px;
-        margin-top: 5px;
+        border-radius: 20px;
+        margin-top: 4px;
         display: inline-block;
     }
 
     .back-btn {
         display: inline-block;
-        padding: 15px 30px;
-        background-color: rgba(255,255,255,0.1);
-        color: white;
+        padding: 12px 24px;
+        background-color: #f1f5f9;
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
         text-decoration: none;
-        border-radius: 20px;
-        font-weight: 600;
-        margin-top: 30px;
-        transition: background-color 0.3s;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        margin-top: 24px;
+        transition: background-color 0.2s;
     }
 
     .back-btn:hover {
-        background-color: rgba(255,255,255,0.2);
+        background-color: #e2e8f0;
     }
     
     @media (max-width: 768px) {
@@ -140,14 +155,10 @@
             flex-direction: column;
             text-align: center;
         }
-        .detail-card {
-            padding: 30px;
-            margin: 20px;
-        }
         .pharmacy-item {
             flex-direction: column;
             align-items: flex-start;
-            gap: 15px;
+            gap: 12px;
         }
         .pharm-price {
             text-align: left;
@@ -157,19 +168,19 @@
 
 {% block content %}
 <div class="container">
-    <div class="glass-panel detail-card">
+    <div class="detail-card">
         <div class="detail-header">
-            <div class="detail-icon">💊</div>
+            <div class="detail-icon-box"><i class="fa-solid fa-pills"></i></div>
             <div class="detail-title">
                 <h1>{{ medicine.name }}</h1>
-                <div class="detail-price">Boshlanlang'ich narx: {{ medicine.min_price }} so'm</div>
+                <div class="detail-price">Boshlang'ich narx: {{ medicine.min_price|floatformat:0 }} so'm</div>
             </div>
         </div>
 
         <div class="detail-info">
             <h3>Tavsif</h3>
             <p>{{ medicine.description }}</p>
-            <p style="margin-top: 10px; font-size: 15px;"><strong>Ishlab chiqaruvchi:</strong> {{ medicine.manufacturer }}</p>
+            <p style="margin-top: 10px; font-size: 14.5px;"><strong>Ishlab chiqaruvchi:</strong> {{ medicine.manufacturer }}</p>
         </div>
 
         <div class="detail-info">
@@ -179,13 +190,15 @@
                 <div class="pharmacy-item {% if forloop.first %}cheapest{% endif %}">
                     <div class="pharm-details">
                         <h4>{{ stock.pharmacy.name }}</h4>
-                        <p>📍 {{ stock.pharmacy.address }}</p>
-                        <p>📞 {{ stock.pharmacy.phone }}</p>
+                        <p><i class="fa-solid fa-location-dot"></i> {{ stock.pharmacy.address }}</p>
+                        {% if stock.pharmacy.phone %}
+                        <p><i class="fa-solid fa-phone"></i> {{ stock.pharmacy.phone }}</p>
+                        {% endif %}
                     </div>
                     <div class="pharm-price">
-                        <span class="price">{{ stock.price }} so'm</span>
+                        <span class="price">{{ stock.price|floatformat:0 }} so'm</span>
                         {% if forloop.first %}
-                            <span class="cheapest-badge">Eng arzon narx!</span>
+                            <span class="cheapest-badge">Eng arzon narx</span>
                         {% endif %}
                     </div>
                 </div>
@@ -196,7 +209,7 @@
         </div>
 
         <div style="text-align: center;">
-            <a href="{% url 'index' %}" class="back-btn">Ortga qaytish</a>
+            <a href="{% url 'index' %}" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Ortga qaytish</a>
         </div>
     </div>
 </div>
