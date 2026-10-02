@@ -7,10 +7,8 @@ django.setup()
 
 from search.models import Medicine, Pharmacy, MedicineStock
 
-# Clear existing
-Medicine.objects.all().delete()
-Pharmacy.objects.all().delete()
-MedicineStock.objects.all().delete()
+# Don't wipe everything blindly; update or create existing
+
 
 # Нөкис қаласындағы реал дәриханалар (apteks.txt тан)
 pharmacies_data = [
@@ -25,7 +23,10 @@ pharmacies_data = [
 
 pharmacies = []
 for p_data in pharmacies_data:
-    p = Pharmacy.objects.create(**p_data)
+    p, _ = Pharmacy.objects.update_or_create(
+        name=p_data['name'],
+        defaults=p_data
+    )
     pharmacies.append(p)
 
 # Create Medicines with images, categories and detailed AI descriptions
@@ -154,22 +155,23 @@ medicines_data = [
 
 for m_data in medicines_data:
     base_price = m_data.pop('base_price')
-    medicine = Medicine.objects.create(**m_data)
+    medicine, created = Medicine.objects.update_or_create(
+        name=m_data['name'],
+        defaults=m_data
+    )
     
-    # Give this medicine to a random number of pharmacies (from 4 to all 9 pharmacies)
-    num_pharms = random.randint(4, len(pharmacies))
-    selected_pharms = random.sample(pharmacies, num_pharms)
-    
-    for pharm in selected_pharms:
-        # random variation in price (-10% to +15%)
-        variation = random.uniform(0.9, 1.15)
-        price = round(base_price * variation, -2) # round to nearest 100
+    if created or not medicine.stocks.exists():
+        num_pharms = random.randint(3, len(pharmacies))
+        selected_pharms = random.sample(pharmacies, num_pharms)
         
-        MedicineStock.objects.create(
-            medicine=medicine,
-            pharmacy=pharm,
-            price=price,
-            in_stock=True
-        )
+        for pharm in selected_pharms:
+            variation = random.uniform(0.9, 1.15)
+            price = round(base_price * variation, -2) # round to nearest 100
+            
+            MedicineStock.objects.update_or_create(
+                medicine=medicine,
+                pharmacy=pharm,
+                defaults={'price': price, 'in_stock': True}
+            )
 
-print(f"Successfully added {len(medicines_data)} medicines and {len(pharmacies_data)} pharmacies!")
+print(f"Successfully processed {len(medicines_data)} medicines and {len(pharmacies_data)} pharmacies!")
