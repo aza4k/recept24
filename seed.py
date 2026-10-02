@@ -146,17 +146,41 @@ medicines_data = [
 ]
 
 def run_seed():
+    from django.contrib.auth.models import User
+
+    # 1. Superadmin va Pharmacy Owner foydalanuvchilarini yaratish
+    admin_user, _ = User.objects.get_or_create(username='admin', defaults={'is_staff': True, 'is_superuser': True})
+    admin_user.set_password('admin123')
+    admin_user.is_staff = True
+    admin_user.is_superuser = True
+    admin_user.save()
+
+    owner_user, _ = User.objects.get_or_create(username='owner', defaults={'first_name': 'Shańaraq', 'last_name': 'Direktor'})
+    owner_user.set_password('pharm123')
+    owner_user.save()
+
+    # 2. Dorixonalarni yaratish
     pharmacies = []
-    for p_data in pharmacies_data:
+    for i, p_data in enumerate(pharmacies_data):
         p, _ = Pharmacy.objects.update_or_create(
             name=p_data['name'],
             defaults=p_data
         )
+        if not p.api_key:
+            p.generate_api_key()
+            p.save()
+        if i == 0:  # "Шаңарақ дәриханасы" ni owner_user ga biriktiramiz
+            p.owner = owner_user
+            p.save()
         pharmacies.append(p)
 
-    for m_data in medicines_data:
+    # 3. Dorilarni shtrix-kodlar bilan yaratish
+    for idx, m_data in enumerate(medicines_data, 1):
         m_copy = dict(m_data)
         base_price = m_copy.pop('base_price', 10000)
+        barcode = f"478001234{idx:04d}"
+        m_copy['barcode'] = barcode
+        
         medicine, created = Medicine.objects.update_or_create(
             name=m_copy['name'],
             defaults=m_copy
@@ -173,10 +197,10 @@ def run_seed():
                 MedicineStock.objects.update_or_create(
                     medicine=medicine,
                     pharmacy=pharm,
-                    defaults={'price': price, 'in_stock': True}
+                    defaults={'price': price, 'in_stock': True, 'quantity': random.randint(10, 100)}
                 )
 
-    print(f"Successfully processed {len(medicines_data)} medicines and {len(pharmacies_data)} pharmacies!")
+    print(f"Successfully processed {len(medicines_data)} medicines and {len(pharmacies_data)} pharmacies with barcodes and accounts!")
 
 if __name__ == '__main__':
     run_seed()
