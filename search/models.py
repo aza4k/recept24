@@ -39,12 +39,12 @@ class Medicine(models.Model):
 
     @property
     def min_price(self):
-        stock = self.stocks.filter(in_stock=True).order_by('price').first()
+        stock = self.stocks.filter(in_stock=True, quantity__gt=0).order_by('price').first()
         return stock.price if stock else 0
         
     @property
     def cheapest_pharmacy_name(self):
-        stock = self.stocks.filter(in_stock=True).order_by('price').first()
+        stock = self.stocks.filter(in_stock=True, quantity__gt=0).order_by('price').first()
         return stock.pharmacy.name if stock else "Noma'lum"
 
     def __str__(self):
@@ -61,6 +61,12 @@ class MedicineStock(models.Model):
     class Meta:
         ordering = ['price']
         unique_together = ('pharmacy', 'medicine')
+
+    def save(self, *args, **kwargs):
+        if self.quantity <= 0:
+            self.quantity = 0
+            self.in_stock = False
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.medicine.name} - {self.pharmacy.name} - {self.price} UZS"

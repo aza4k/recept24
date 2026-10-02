@@ -54,11 +54,19 @@ def index(request):
         
         if selected_medicines:
             pharmacies = Pharmacy.objects.annotate(
-                match_count=Count('stocks', filter=Q(stocks__medicine__in=selected_medicines))
+                match_count=Count('stocks', filter=Q(
+                    stocks__medicine__in=selected_medicines,
+                    stocks__in_stock=True,
+                    stocks__quantity__gt=0
+                ))
             ).filter(match_count=len(selected_medicines))
             
             for pharm in pharmacies:
-                stocks = pharm.stocks.filter(medicine__in=selected_medicines)
+                stocks = pharm.stocks.filter(
+                    medicine__in=selected_medicines,
+                    in_stock=True,
+                    quantity__gt=0
+                )
                 total_price = sum(stock.price for stock in stocks)
                 pharmacies_data.append({
                     'pharmacy': pharm,
@@ -106,17 +114,26 @@ def api_search_pharmacies(request):
         return JsonResponse({'pharmacies': [], 'medicines': []})
     
     pharmacies = Pharmacy.objects.annotate(
-        match_count=Count('stocks', filter=Q(stocks__medicine__in=selected_medicines))
+        match_count=Count('stocks', filter=Q(
+            stocks__medicine__in=selected_medicines,
+            stocks__in_stock=True,
+            stocks__quantity__gt=0
+        ))
     ).filter(match_count=len(medicine_ids))
     
     result = []
     for pharm in pharmacies:
-        stocks = pharm.stocks.filter(medicine__in=selected_medicines)
+        stocks = pharm.stocks.filter(
+            medicine__in=selected_medicines,
+            in_stock=True,
+            quantity__gt=0
+        )
         total_price = sum(float(stock.price) for stock in stocks)
         stock_list = [{
             'medicine_name': s.medicine.name,
             'manufacturer': s.medicine.manufacturer,
             'price': float(s.price),
+            'quantity': s.quantity,
         } for s in stocks]
         
         result.append({
@@ -168,11 +185,12 @@ def api_all_medicines(request):
 def api_medicine_detail(request, medicine_id):
     """Bitta dori haqida to'liq ma'lumot (AI popup uchun)"""
     medicine = get_object_or_404(Medicine, pk=medicine_id)
-    stocks = medicine.stocks.select_related('pharmacy').order_by('price')
+    stocks = medicine.stocks.filter(in_stock=True, quantity__gt=0).select_related('pharmacy').order_by('price')
     pharmacies_list = [{
         'pharmacy_name': s.pharmacy.name,
         'address': s.pharmacy.address,
         'price': float(s.price),
+        'quantity': s.quantity,
     } for s in stocks]
     
     return JsonResponse({

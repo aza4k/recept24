@@ -261,9 +261,15 @@ def desktop_update_stock(request):
     if not user.is_superuser and stock.pharmacy.owner != user:
         return JsonResponse({'error': 'Bu amalga ruxsatingiz yo\'q'}, status=403)
 
-    if price is not None: stock.price = float(price)
-    if in_stock is not None: stock.in_stock = bool(in_stock)
-    if quantity is not None: stock.quantity = int(quantity)
+    if price is not None: stock.price = max(0.0, float(price))
+    if quantity is not None: stock.quantity = max(0, int(quantity))
+    if in_stock is not None:
+        stock.in_stock = bool(in_stock)
+        if stock.in_stock and stock.quantity <= 0:
+            stock.quantity = 1
+    if stock.quantity <= 0:
+        stock.quantity = 0
+        stock.in_stock = False
     stock.save()
 
     return JsonResponse({
@@ -319,8 +325,14 @@ def sync_1c_webhook(request):
                 name = str(item.get('name', '')).strip()
                 barcode = str(item.get('barcode', '')).strip() if item.get('barcode') else ''
                 price = float(item.get('price', 0))
-                quantity = int(item.get('quantity', 1))
-                in_stock = bool(item.get('in_stock', quantity > 0))
+                quantity = max(0, int(item.get('quantity', 0)))
+                raw_in_stock = item.get('in_stock', None)
+                if raw_in_stock is None:
+                    in_stock = (quantity > 0)
+                else:
+                    in_stock = bool(raw_in_stock) and (quantity > 0)
+                if quantity == 0:
+                    in_stock = False
 
                 if not name and not barcode:
                     errors.append(f"Qator #{idx+1}: nom yoki shtrix-kod ko'rsatilmagan")
@@ -412,8 +424,14 @@ def desktop_bulk_sync(request):
             name = str(item.get('name', '')).strip()
             barcode = str(item.get('barcode', '')).strip() if item.get('barcode') else ''
             price = float(item.get('price', 0))
-            quantity = int(item.get('quantity', 10))
-            in_stock = bool(item.get('in_stock', True))
+            quantity = max(0, int(item.get('quantity', 0)))
+            raw_in_stock = item.get('in_stock', None)
+            if raw_in_stock is None:
+                in_stock = (quantity > 0)
+            else:
+                in_stock = bool(raw_in_stock) and (quantity > 0)
+            if quantity == 0:
+                in_stock = False
 
             medicine = None
             if barcode: medicine = Medicine.objects.filter(barcode=barcode).first()

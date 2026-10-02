@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recept24</title>
+  <style>
+    /* ========================================================
+       LIQUID GLASS THEME (STRICTLY NO GRADIENTS)
+       ======================================================== */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-subtle: rgba(37, 99, 235, 0.08);
+      --primary-border: rgba(37, 99, 235, 0.2);
+
+      --dark-navy: #0f172a;
+      --dark-blue: #1e3a8a;
+
+      --bg-base: #f1f5f9;
+      --glass-bg: rgba(255, 255, 255, 0.72);
+      --glass-card: rgba(255, 255, 255, 0.85);
+      --glass-hover: rgba(255, 255, 255, 0.95);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --glass-border-subtle: rgba(226, 232, 240, 0.8);
+
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+
+      --success: #059669;
+      --success-bg: rgba(5, 150, 105, 0.1);
+      --danger: #dc2626;
+      --danger-bg: rgba(220, 38, 38, 0.1);
+      --warning: #d97706;
+      --warning-bg: rgba(217, 119, 6, 0.1);
+
+      --glass-blur: blur(24px);
+      --shadow-glass: 0 8px 32px 0 rgba(15, 23, 42, 0.06);
+      --shadow-sm: 0 2px 8px 0 rgba(15, 23, 42, 0.04);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ambient Liquid Orbs for Glass Reflection (NO GRADIENTS - Solid Colors) */
+    .ambient-sphere {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.25;
+      filter: blur(80px);
+    }
+    .orb-1 { width: 380px; height: 380px; background-color: #93c5fd; top: -100px; right: -50px; }
+    .orb-2 { width: 450px; height: 450px; background-color: #bfdbfe; bottom: -120px; left: 100px; }
+    .orb-3 { width: 280px; height: 280px; background-color: #a7f3d0; top: 40%; right: 20%; }
+
+    /* App Shell Container */
+    #app-root {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========================================================
+       TOP HEADER (LIQUID GLASS)
+       ======================================================== */
+    .top-header {
+      height: 68px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+    }
+
+    .header-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 42px;
+      height: 42px;
+      background-color: var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .logo-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark-navy);
+      letter-spacing: -0.3px;
+    }
+
+    .logo-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .pharmacy-pill {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--glass-border-subtle);
+      padding: 7px 16px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dark-navy);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+      box-shadow: 0 0 8px rgba(5, 150, 105, 0.6);
+    }
+
+    .user-pill {
+      background: var(--primary-subtle);
+      border: 1px solid var(--primary-border);
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .btn-logout {
+      background-color: #ffffff;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      color: var(--danger);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover {
+      background-color: var(--danger-bg);
+      border-color: var(--danger);
+    }
+
+    /* ========================================================
+       MAIN WORKSPACE (SIDEBAR + CONTENT)
+       ======================================================== */
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Glass Sidebar */
+    .sidebar {
+      width: 250px;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-right: 1px solid var(--glass-border);
+      padding: 24px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 0 12px 10px 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+      stroke: var(--text-muted);
+      transition: stroke 0.2s;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--dark-navy);
+      border-color: var(--glass-border);
+    }
+
+    .nav-item.active {
+      background: #ffffff;
+      color: var(--primary);
+      border-color: var(--primary-border);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+    }
+
+    .nav-item.active svg {
+      stroke: var(--primary);
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ========================================================
+       LIQUID GLASS CARDS & WIDGETS
+       ======================================================== */
+    .glass-card {
+      background: var(--glass-card);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-glass);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-blue { background-color: var(--primary-subtle); color: var(--primary); }
+    .icon-green { background-color: var(--success-bg); color: var(--success); }
+    .icon-navy { background-color: rgba(15, 23, 42, 0.06); color: var(--dark-navy); }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Stat Cards Row */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--dark-navy);
+      margin-top: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Controls Row (Search & Action) */
+    .controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 440px;
+    }
+
+    .search-input-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-light);
+    }
+
+    .glass-input {
+      width: 100%;
+      height: 42px;
+      background: #ffffff;
+      border: 1px solid var(--glass-border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0 16px 0 42px;
+      font-size: 13px;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .glass-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-subtle);
+    }
+
+    .btn-solid-blue {
+      height: 42px;
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s, box-shadow 0.2s;
+    }
+    .btn-solid-blue:hover {
+      background-color: var(--primary-hover);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-solid-green {
+      height: 42px;
+      background-color: var(--success);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s;
+    }
+    .btn-solid-green:hover {
+      background-color: #047857;
+    }
+
+    .btn-glass-subtle {
+      height: 42px;
+      background: #ffffff;
+      border: 1px solid var(--glass-border-subtle);
+      color: var(--text-main);
+      border-radius: var(--radius-sm);
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-glass-subtle:hover {
+      background: var(--bg-base);
+    }
+
+    /* ========================================================
+       DATA TABLE (LIQUID GLASS)
+       ======================================================== */
+    .table-container {
+      background: var(--glass-card);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-glass);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(241, 245, 249, 0.7);
+      padding: 14px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--glass-border-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 16px 20px;
+      font-size: 13px;
+      color: var(--text-main);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-success { background-color: var(--success-bg); color: var(--success); }
+    .badge-danger { background-color: var(--danger-bg); color: var(--danger); }
+    .badge-blue { background-color: var(--primary-subtle); color: var(--primary); }
+    .badge-gray { background-color: rgba(100, 116, 139, 0.1); color: var(--text-muted); }
+
+    .price-tag {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 14px;
+    }
+
+    .barcode-tag {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Action Buttons inside Table */
+    .btn-action-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid var(--glass-border-subtle);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--primary);
+      transition: all 0.2s;
+    }
+    .btn-action-icon:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* ========================================================
+       MODAL DIALOG (FROSTED GLASS)
+       ======================================================== */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .glass-modal {
+      width: 480px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark-navy);
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 4px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      height: 42px;
+      background: #ffffff;
+      border: 1px solid var(--glass-border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0 14px;
+      font-size: 13px;
+      color: var(--text-main);
+      outline: none;
+    }
+    .form-control:focus {
+      border-color: var(--primary);
+    }
+
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    /* ========================================================
+       LOGIN SCREEN OVERLAY (LIQUID GLASS)
+       ======================================================== */
+    #login-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg-base);
+    }
+
+    .glass-login-card {
+      width: 440px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 38px;
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .login-header-solid {
+      background-color: var(--primary);
+      border-radius: 16px;
+      padding: 22px;
+      text-align: center;
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+    }
+
+    .login-header-solid h2 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .login-header-solid p {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .account-chips {
+      background: rgba(241, 245, 249, 0.8);
+      border: 1px solid var(--glass-border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+
+    .account-chips-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .chips-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chip-btn {
+      background: #ffffff;
+      border: 1px solid var(--glass-border-subtle);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--dark-navy);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chip-btn:hover {
+      background: var(--primary-subtle);
+      border-color: var(--primary-border);
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Light Orbs for Liquid Glass Depth (No Gradients) -->
+  <div class="ambient-sphere orb-1"></div>
+  <div class="ambient-sphere orb-2"></div>
+  <div class="ambient-sphere orb-3"></div>
+
+  <!-- ==================== 1. LOGIN OVERLAY ==================== -->
+  <div id="login-overlay">
+    <div class="glass-login-card">
+      <div class="login-header-solid">
+        <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:8px;">
+          <img src="logo.png" style="width:48px; height:48px; border-radius:12px; object-fit:contain; box-shadow:0 4px 14px rgba(15,23,42,0.12);" alt="Recept24">
+          <h2 style="font-size:26px; font-weight:800; color:var(--dark-navy); margin:0; letter-spacing:-0.5px;">Recept24</h2>
+        </div>
+        <p>Dorixona Boshqaruvi va 1C Sinxronizatsiya</p>
+      </div>
+
+      <div style="text-align:center;">
+        <h3 style="font-size:18px; font-weight:700; color:var(--dark-navy);">Tizimga Kirish</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">Faqat vakolatli dorixona boshqaruvchilari uchun</p>
+      </div>
+
+      <div id="login-error" style="display:none; padding:10px 14px; background:var(--danger-bg); border:1px solid rgba(220,38,38,0.3); border-radius:8px; color:var(--danger); font-size:12px; font-weight:600;"></div>
+
+      <div class="form-group">
+        <label class="form-label">Login</label>
+        <input type="text" id="login-username" class="form-control" value="owner" placeholder="Loginni kiriting">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Parol</label>
+        <input type="password" id="login-password" class="form-control" value="pharm123" placeholder="Parolni kiriting">
+      </div>
+
+      <button id="btn-do-login" class="btn-solid-blue" style="width:100%; justify-content:center; height:46px; font-size:14px;">
+        Kirish
+      </button>
+
+      <div class="account-chips">
+        <div class="account-chips-title">Tezkor sinov akkauntlari:</div>
+        <div class="chips-row">
+          <button class="chip-btn" onclick="fillLogin('owner','pharm123')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M9 9h6M12 6v6"/></svg>
+            Dorixonachi (owner)
+          </button>
+          <button class="chip-btn" onclick="fillLogin('admin','admin123')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Bosh Admin (admin)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. MAIN APP SHELL ==================== -->
+  <div id="app-root" style="display:none;">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-logo-group">
+        <img src="logo.png" style="width:42px; height:42px; border-radius:10px; object-fit:contain; box-shadow:0 4px 12px rgba(15,23,42,0.08);" alt="Recept24">
+        <div class="logo-text">
+          <h1>Recept24</h1>
+          <p>Dorixona boshqaruv tizimi</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="pharmacy-pill" id="header-pharmacy-pill">
+          <span class="status-dot"></span>
+          <span id="header-pharmacy-name">Шаңарақ дәриханасы</span>
+        </div>
+
+        <div class="user-pill" id="header-user-pill">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span id="header-username">owner</span>
+        </div>
+
+        <button class="btn-logout" onclick="handleLogout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Chiqish
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="main-workspace">
+      <!-- Glass Sidebar -->
+      <nav class="sidebar">
+        <div class="sidebar-section-title">Boshqaruv Paneli</div>
+
+        <div class="nav-item active" onclick="switchTab('inventory')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          Ombor & Narxlar
+        </div>
+
+        <div class="nav-item" onclick="switchTab('sync')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          1C & Fayl Sinxron
+        </div>
+
+        <div class="nav-item" onclick="switchTab('settings')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></svg>
+          Dorixona Sozlamalari
+        </div>
+
+        <div class="nav-item" id="nav-users" style="display:none;" onclick="switchTab('users')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Foydalanuvchilar (Admin)
+        </div>
+
+        <div class="nav-item" onclick="switchTab('logs')">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+          Audit & Tarix
+        </div>
+      </nav>
+
+      <!-- Dynamic Content Body -->
+      <main class="content-area">
+
+        <!-- TAB 1: OMBOR VA NARXLAR -->
+        <section id="tab-inventory" class="tab-pane">
+          <!-- Stats Row -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="icon-box icon-blue">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Jami Dorilar</div>
+                <div class="stat-number" id="stat-total">15</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="icon-box icon-green">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Mavjud Dorilar</div>
+                <div class="stat-number" id="stat-available" style="color:var(--success);">15</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="icon-box icon-navy">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Tugagan Dorilar</div>
+                <div class="stat-number" id="stat-out" style="color:var(--danger);">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls Bar -->
+          <div class="controls-bar" style="margin-top:20px;">
+            <div class="search-input-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" id="inventory-search" class="glass-input" placeholder="Dori nomi yoki shtrix-kodi bo'yicha qidirish..." oninput="filterInventory()">
+            </div>
+
+            <div style="display:flex; gap:10px;">
+              <button class="btn-glass-subtle" onclick="loadInventory()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                Yangilash
+              </button>
+            </div>
+          </div>
+
+          <!-- Stocks Table -->
+          <div class="table-container" style="margin-top:20px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Shtrix-kod</th>
+                  <th>Dori nomi</th>
+                  <th>Toifasi</th>
+                  <th>Ishlab chiqaruvchi</th>
+                  <th>Narxi (so'm)</th>
+                  <th>Qoldiq</th>
+                  <th>Holati</th>
+                  <th style="text-align:center;">Amal</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-tbody">
+                <!-- Javascript orqali to'ldiriladi -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB 2: 1C VA EXCEL SINXRONIZATSIYA -->
+        <section id="tab-sync" class="tab-pane" style="display:none;">
+          <!-- 1C Card -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="icon-box icon-blue">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                </div>
+                <div>
+                  <div class="card-title">1C:Предприятие Автоматик Интеграция</div>
+                  <div class="card-subtitle">1C:Аптека / 1С:Розница тизимлари учун расмий Webhook созламаси</div>
+                </div>
+              </div>
+              <span class="badge-pill badge-success">● Faol</span>
+            </div>
+
+            <p style="font-size:13px; color:var(--text-muted); line-height:1.5; margin-bottom:18px;">
+              Ushbu ma'lumotlarni 1C mutaxassisingizga bering. 1C dasturi har 15 daqiqada kassa qoldiqlarini fon rejimida Recept24 ga avtomatik yuboradi.
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="background:#ffffff; border:1px solid var(--glass-border-subtle); border-radius:10px; padding:12px 18px; display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                  <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">1C Webhook URL</div>
+                  <div id="sync-webhook-url" style="font-family:monospace; font-size:13px; font-weight:600; color:var(--dark-navy); margin-top:2px;">https://web-production-13565.up.railway.app/api/sync/1c/</div>
+                </div>
+                <button class="btn-glass-subtle" onclick="copyText(document.getElementById('sync-webhook-url').innerText, 'Webhook URL')">Nusxa olish</button>
+              </div>
+
+              <div style="background:#ffffff; border:1px solid var(--glass-border-subtle); border-radius:10px; padding:12px 18px; display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                  <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Dorixona Maxfiy API Key</div>
+                  <div id="sync-api-key" style="font-family:monospace; font-size:13px; font-weight:700; color:var(--primary); margin-top:2px;">rec_...</div>
+                </div>
+                <button class="btn-glass-subtle" onclick="copyText(document.getElementById('sync-api-key').innerText, 'API Key')">Nusxa olish</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Excel Bulk Sync Card -->
+          <div class="glass-card" style="margin-top:20px;">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="icon-box icon-green">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div>
+                  <div class="card-title">Excel / CSV Preyskurantni Tezkor Yuklash</div>
+                  <div class="card-subtitle">Excel jadvalingizdagi narxlarni nusxalab shu yerga joylashtiring</div>
+                </div>
+              </div>
+            </div>
+
+            <textarea id="bulk-paste-area" style="width:100%; height:140px; background:#ffffff; border:1px solid var(--glass-border-subtle); border-radius:var(--radius-sm); padding:14px; font-family:monospace; font-size:12px; outline:none; resize:none;" placeholder="4780012340001	Paratsetamol 500mg	2800	120&#10;4780012340002	Analgin 500mg	1600	60"></textarea>
+
+            <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:14px;">
+              <button class="btn-solid-green" onclick="handleBulkUpload()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Bazasini Yangilash
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 3: DORIXONA SOZLAMALARI -->
+        <section id="tab-settings" class="tab-pane" style="display:none;">
+          <div class="glass-card" style="max-width:760px;">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="icon-box icon-blue">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/></svg>
+                </div>
+                <div>
+                  <div class="card-title">Dorixona Profil Ma'lumotlari</div>
+                  <div class="card-subtitle">Ushbu ma'lumotlar Recept24 mobil ilovasida foydalanuvchilarga ko'rsatiladi</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div class="form-group">
+                <label class="form-label">Dorixona nomi</label>
+                <input type="text" id="setting-name" class="form-control">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Manzili (Mo'ljal bilan)</label>
+                <input type="text" id="setting-address" class="form-control">
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="form-group">
+                  <label class="form-label">Telefon raqam</label>
+                  <input type="text" id="setting-phone" class="form-control" placeholder="+998 90 123 45 67">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Ish vaqti</label>
+                  <input type="text" id="setting-hours" class="form-control" placeholder="24 саат yoki 08:00-23:00">
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="form-group">
+                  <label class="form-label">Kenglik (Latitude)</label>
+                  <input type="text" id="setting-lat" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Uzunlik (Longitude)</label>
+                  <input type="text" id="setting-lng" class="form-control">
+                </div>
+              </div>
+
+              <button class="btn-solid-blue" style="margin-top:10px; width:180px; justify-content:center;" onclick="savePharmacySettings()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Saqlash
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 4: ADMIN FOYDALANUVCHILAR -->
+        <section id="tab-users" class="tab-pane" style="display:none;">
+          <div class="controls-bar">
+            <div>
+              <div style="font-size:16px; font-weight:700; color:var(--dark-navy);">Dorixona Egalari va Foydalanuvchilar</div>
+              <div style="font-size:12px; color:var(--text-muted);">Boshqaruv tizimiga kirish huquqiga ega akkauntlar</div>
+            </div>
+            <button class="btn-solid-blue" onclick="openAddUserModal()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Yangi Akkaunt Qo'shish
+            </button>
+          </div>
+
+          <div class="table-container" style="margin-top:20px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Login (Username)</th>
+                  <th>Ism-sharif</th>
+                  <th>Rol</th>
+                  <th>Biriktirilgan Dorixona</th>
+                  <th>Holati</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB 5: AUDIT VA TARIX -->
+        <section id="tab-logs" class="tab-pane" style="display:none;">
+          <div class="controls-bar">
+            <div>
+              <div style="font-size:16px; font-weight:700; color:var(--dark-navy);">Sinxronizatsiya Tarixi va Jurnali (Audit)</div>
+              <div style="font-size:12px; color:var(--text-muted);">1C va Excel orqali kelib tushgan qoldiqlar yangilanishlari jurnali</div>
+            </div>
+            <button class="btn-glass-subtle" onclick="loadLogs()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              Yangilash
+            </button>
+          </div>
+
+          <div class="table-container" style="margin-top:20px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Vaqti</th>
+                  <th>Dorixona</th>
+                  <th>Manba</th>
+                  <th>Qabul qilingan</th>
+                  <th>Yangilangan</th>
+                  <th>Holati</th>
+                  <th>Tafsilotlar</th>
+                </tr>
+              </thead>
+              <tbody id="logs-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== 3. EDIT PRICE MODAL ==================== -->
+  <div id="edit-stock-modal" class="modal-backdrop">
+    <div class="glass-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-med-name">Dori nomini tahrirlash</h3>
+        <button class="btn-close" onclick="closeModal('edit-stock-modal')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <input type="hidden" id="modal-stock-id">
+
+      <div class="form-group">
+        <label class="form-label">Shtrix-kod</label>
+        <input type="text" id="modal-med-barcode" class="form-control" readonly style="background:#f8fafc;">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Yangi Narx (so'm)</label>
+        <input type="number" id="modal-med-price" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Qoldiq Soni</label>
+        <input type="number" id="modal-med-qty" class="form-control">
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px; margin-top:4px;">
+        <input type="checkbox" id="modal-med-instock" style="width:18px; height:18px;">
+        <label for="modal-med-instock" style="font-size:13px; font-weight:600; color:var(--text-main);">Dorixonada mavjud</label>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-glass-subtle" onclick="closeModal('edit-stock-modal')">Bekor qilish</button>
+        <button class="btn-solid-blue" onclick="saveStockEdit()">Saqlash</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 4. ADD USER MODAL ==================== -->
+  <div id="add-user-modal" class="modal-backdrop">
+    <div class="glass-modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Yangi Dorixona Egasi Yaratish</h3>
+        <button class="btn-close" onclick="closeModal('add-user-modal')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Login (Username)</label>
+        <input type="text" id="new-user-username" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Parol</label>
+        <input type="password" id="new-user-password" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ism-sharif</label>
+        <input type="text" id="new-user-fullname" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Biriktiriladigan Dorixona</label>
+        <select id="new-user-pharmacy" class="form-control"></select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-glass-subtle" onclick="closeModal('add-user-modal')">Bekor qilish</button>
+        <button class="btn-solid-blue" onclick="submitCreateUser()">Yaratish</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let currentAuthToken = null;
+    let currentUser = null;
+    let currentPharmacy = null;
+    let inventoryData = [];
+
+    // Login Helpers
+    function fillLogin(u, p) {
+      document.getElementById('login-username').value = u;
+      document.getElementById('login-password').value = p;
+    }
+
+    document.getElementById('btn-do-login').addEventListener('click', async () => {
+      const u = document.getElementById('login-username').value.trim();
+      const p = document.getElementById('login-password').value.trim();
+      const errEl = document.getElementById('login-error');
+      errEl.style.display = 'none';
+
+      if (!u || !p) {
+        errEl.innerText = 'Login va parolni kiriting';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      document.getElementById('btn-do-login').innerText = 'Tekshirilmoqda...';
+
+      try {
+        const res = await window.pywebview.api.login(u, p);
+        if (res.status === 'ok') {
+          currentAuthToken = res.token;
+          currentUser = res.user;
+          currentPharmacy = res.pharmacy;
+          setupUserInterface();
+        } else {
+          errEl.innerText = res.error || 'Login yoki parol xato';
+          errEl.style.display = 'block';
+        }
+      } catch (e) {
+        errEl.innerText = 'Ulanish xatosi: ' + e;
+        errEl.style.display = 'block';
+      } finally {
+        document.getElementById('btn-do-login').innerText = 'Kirish';
+      }
+    });
+
+    function setupUserInterface() {
+      document.getElementById('login-overlay').style.display = 'none';
+      document.getElementById('app-root').style.display = 'flex';
+
+      document.getElementById('header-username').innerText = currentUser.username;
+      if (currentPharmacy) {
+        document.getElementById('header-pharmacy-name').innerText = currentPharmacy.name;
+        document.getElementById('sync-api-key').innerText = currentPharmacy.api_key;
+        document.getElementById('setting-name').value = currentPharmacy.name || '';
+        document.getElementById('setting-address').value = currentPharmacy.address || '';
+        document.getElementById('setting-phone').value = currentPharmacy.phone || '';
+        document.getElementById('setting-hours').value = currentPharmacy.work_hours || '24 саат';
+        document.getElementById('setting-lat').value = currentPharmacy.latitude || 42.46;
+        document.getElementById('setting-lng').value = currentPharmacy.longitude || 59.60;
+      } else {
+        document.getElementById('header-pharmacy-name').innerText = 'Superadmin Rejimi';
+      }
+
+      if (currentUser.is_superuser) {
+        document.getElementById('nav-users').style.display = 'flex';
+      }
+
+      loadInventory();
+      loadLogs();
+    }
+
+    function handleLogout() {
+      currentAuthToken = null;
+      currentUser = null;
+      currentPharmacy = null;
+      document.getElementById('app-root').style.display = 'none';
+      document.getElementById('login-overlay').style.display = 'flex';
+    }
+
+    // Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      const targetPane = document.getElementById('tab-' + tabId);
+      if (targetPane) targetPane.style.display = 'block';
+
+      event.currentTarget.classList.add('active');
+
+      if (tabId === 'users' && currentUser.is_superuser) loadUsers();
+      if (tabId === 'logs') loadLogs();
+      if (tabId === 'inventory') loadInventory();
+    }
+
+    // Inventory
+    async function loadInventory() {
+      try {
+        const res = await window.pywebview.api.get_stocks("");
+        inventoryData = res.stocks || [];
+        renderInventoryTable(inventoryData);
+        updateStats();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateStats() {
+      const total = inventoryData.length;
+      const inStock = inventoryData.filter(x => Boolean(x.in_stock) && Number(x.quantity) > 0).length;
+      document.getElementById('stat-total').innerText = total;
+      document.getElementById('stat-available').innerText = inStock;
+      document.getElementById('stat-out').innerText = total - inStock;
+    }
+
+    function renderInventoryTable(items) {
+      const tbody = document.getElementById('inventory-tbody');
+      tbody.innerHTML = '';
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+        const qty = Number(item.quantity) || 0;
+        const isAvailable = Boolean(item.in_stock) && qty > 0;
+        const statusHtml = isAvailable 
+          ? `<span class="badge-pill badge-success" style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Mavjud</span>` 
+          : `<span class="badge-pill badge-danger" style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Mavjud emas</span>`;
+
+        tr.innerHTML = `
+          <td class="barcode-tag">${item.barcode || '—'}</td>
+          <td style="font-weight:700;">${item.name}</td>
+          <td><span class="badge-pill badge-blue">${item.category}</span></td>
+          <td style="color:var(--text-muted);">${item.manufacturer}</td>
+          <td class="price-tag">${Math.round(item.price).toLocaleString()} so'm</td>
+          <td style="font-weight:600; color:${qty <= 0 ? 'var(--danger)' : 'inherit'};">${qty} dona</td>
+          <td>${statusHtml}</td>
+          <td style="text-align:center;">
+            <button class="btn-action-icon" onclick="openEditModal(${item.stock_id})">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterInventory() {
+      const q = document.getElementById('inventory-search').value.toLowerCase();
+      const filtered = inventoryData.filter(i => 
+        (i.name && i.name.toLowerCase().includes(q)) ||
+        (i.barcode && i.barcode.toLowerCase().includes(q))
+      );
+      renderInventoryTable(filtered);
+    }
+
+    function openEditModal(stockId) {
+      const item = inventoryData.find(x => x.stock_id === stockId);
+      if (!item) return;
+
+      document.getElementById('modal-stock-id').value = item.stock_id;
+      document.getElementById('modal-med-name').innerText = item.name;
+      document.getElementById('modal-med-barcode').value = item.barcode || 'Shtrix-kodsiz';
+      document.getElementById('modal-med-price').value = item.price;
+      const qty = Number(item.quantity) || 0;
+      document.getElementById('modal-med-qty').value = qty;
+      document.getElementById('modal-med-instock').checked = Boolean(item.in_stock) && qty > 0;
+
+      document.getElementById('edit-stock-modal').classList.add('open');
+    }
+
+    async function saveStockEdit() {
+      const stockId = parseInt(document.getElementById('modal-stock-id').value);
+      const price = parseFloat(document.getElementById('modal-med-price').value) || 0;
+      let qty = parseInt(document.getElementById('modal-med-qty').value) || 0;
+      let inStock = document.getElementById('modal-med-instock').checked;
+
+      if (qty <= 0) {
+        qty = 0;
+        inStock = false;
+      }
+      if (!inStock) {
+        qty = 0;
+      }
+
+      const res = await window.pywebview.api.update_stock(stockId, price, inStock, qty);
+      if (res.status === 'ok') {
+        closeModal('edit-stock-modal');
+        loadInventory();
+      } else {
+        alert(res.error || 'Xatolik yuz berdi');
+      }
+    }
+
+    // Modal input event listeners for dynamic sync between quantity and in_stock
+    document.addEventListener('DOMContentLoaded', () => {
+      const qtyInput = document.getElementById('modal-med-qty');
+      const inStockCheck = document.getElementById('modal-med-instock');
+      if (qtyInput && inStockCheck) {
+        qtyInput.addEventListener('input', () => {
+          const val = parseInt(qtyInput.value) || 0;
+          inStockCheck.checked = val > 0;
+        });
+        inStockCheck.addEventListener('change', () => {
+          if (!inStockCheck.checked) {
+            qtyInput.value = 0;
+          } else if (parseInt(qtyInput.value || 0) <= 0) {
+            qtyInput.value = 10;
+          }
+        });
+      }
+    });
+
+    // Bulk upload
+    async function handleBulkUpload() {
+      const text = document.getElementById('bulk-paste-area').value.trim();
+      if (!text) return;
+
+      const lines = text.split('\n');
+      const items = [];
+      lines.forEach(l => {
+        const parts = l.split(/[\t,;]/);
+        if (parts.length >= 2) {
+          let b = '', n = '', p = 0, q = 10;
+          if (parts.length >= 3) {
+            b = parts[0].trim();
+            n = parts[1].trim();
+            p = parseFloat(parts[2].replace(/[^0-9.]/g, '')) || 0;
+            if (parts.length >= 4) q = parseInt(parts[3].replace(/[^0-9]/g, '')) || 0;
+          } else {
+            n = parts[0].trim();
+            p = parseFloat(parts[1].replace(/[^0-9.]/g, '')) || 0;
+          }
+          const qVal = Math.max(0, parseInt(q) || 0);
+          if (n && p > 0) items.push({ barcode: b, name: n, price: p, quantity: qVal, in_stock: qVal > 0 });
+        }
+      });
+
+      if (!items.length) {
+        alert('Tushunarli qatorlar topilmadi');
+        return;
+      }
+
+      const res = await window.pywebview.api.bulk_upload(items);
+      if (res.status === 'ok') {
+        alert(`${res.updated_count} ta dori narxi yangilandi!`);
+        document.getElementById('bulk-paste-area').value = '';
+        loadInventory();
+      } else {
+        alert(res.error || 'Yuklab bo\'lmadi');
+      }
+    }
+
+    // Settings
+    async function savePharmacySettings() {
+      const payload = {
+        name: document.getElementById('setting-name').value.trim(),
+        address: document.getElementById('setting-address').value.trim(),
+        phone: document.getElementById('setting-phone').value.trim(),
+        work_hours: document.getElementById('setting-hours').value.trim(),
+        latitude: parseFloat(document.getElementById('setting-lat').value) || 42.46,
+        longitude: parseFloat(document.getElementById('setting-lng').value) || 59.60,
+      };
+      const res = await window.pywebview.api.update_pharmacy(payload);
+      if (res.status === 'ok') {
+        alert('Dorixona ma\'lumotlari muvaffaqiyatli saqlandi!');
+        document.getElementById('header-pharmacy-name').innerText = payload.name;
+      } else {
+        alert(res.error || 'Xatolik');
+      }
+    }
+
+    // Users
+    async function loadUsers() {
+      const res = await window.pywebview.api.get_admin_users();
+      const tbody = document.getElementById('users-tbody');
+      tbody.innerHTML = '';
+      (res.users || []).forEach(u => {
+        const tr = document.createElement('tr');
+        const roleBadge = u.is_superuser ? '<span class="badge-pill badge-danger">Bosh Admin</span>' : '<span class="badge-pill badge-blue">Dorixona Egasi</span>';
+        tr.innerHTML = `
+          <td>#${u.id}</td>
+          <td style="font-weight:700;">${u.username}</td>
+          <td>${u.full_name || '—'}</td>
+          <td>${roleBadge}</td>
+          <td style="font-weight:600;">${u.pharmacy_name}</td>
+          <td><span class="badge-pill badge-success">Faol</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Populate pharmacy dropdown for new user modal
+      const sel = document.getElementById('new-user-pharmacy');
+      sel.innerHTML = '<option value="">Biriktirilmasin</option>';
+      (res.pharmacies || []).forEach(p => {
+        sel.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+      });
+    }
+
+    function openAddUserModal() {
+      document.getElementById('add-user-modal').classList.add('open');
+    }
+
+    async function submitCreateUser() {
+      const u = document.getElementById('new-user-username').value.trim();
+      const p = document.getElementById('new-user-password').value.trim();
+      const f = document.getElementById('new-user-fullname').value.trim();
+      const pharmId = parseInt(document.getElementById('new-user-pharmacy').value) || null;
+
+      if (!u || !p) {
+        alert('Login va parol to\'ldirilishi shart');
+        return;
+      }
+
+      const res = await window.pywebview.api.create_user(u, p, f, pharmId);
+      if (res.status === 'ok') {
+        closeModal('add-user-modal');
+        loadUsers();
+        alert('Foydalanuvchi yaratildi!');
+      } else {
+        alert(res.error || 'Xatolik');
+      }
+    }
+
+    // Logs
+    async function loadLogs() {
+      const res = await window.pywebview.api.get_sync_logs();
+      const tbody = document.getElementById('logs-tbody');
+      tbody.innerHTML = '';
+      (res.logs || []).forEach(l => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family:monospace; font-size:12px;">${l.created_at}</td>
+          <td style="font-weight:600;">${l.pharmacy_name}</td>
+          <td><span class="badge-pill badge-blue">${l.sync_type}</span></td>
+          <td>${l.items_received} ta</td>
+          <td style="color:var(--success); font-weight:700;">${l.items_updated} ta</td>
+          <td><span class="badge-pill badge-success">${l.status}</span></td>
+          <td style="color:var(--text-muted); font-size:12px;">${l.details || '—'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function copyText(text, label) {
+      navigator.clipboard.writeText(text);
+      alert(label + ' nusxalandi!');
+    }
+  </script>
+</body>
+</html>
