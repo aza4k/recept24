@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import '../services/api_service.dart';
+import '../services/locale_service.dart';
 import 'map_screen.dart';
 
 class ResultsScreen extends StatefulWidget {
@@ -103,10 +104,15 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
   }
 
   void _openMap(Map<String, dynamic> pharmacy) {
+    final pharmId = pharmacy['id'] is int ? pharmacy['id'] as int : int.tryParse(pharmacy['id']?.toString() ?? '');
+    if (pharmId != null) {
+      ApiService.trackEvent(pharmId, 'map_view');
+    }
     Navigator.push(
       context,
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => MapScreen(
+          pharmacyId: pharmId,
           pharmacyLat: (pharmacy['latitude'] as num).toDouble(),
           pharmacyLng: (pharmacy['longitude'] as num).toDouble(),
           pharmacyName: pharmacy['name'],
@@ -119,7 +125,13 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
     );
   }
 
-  void _callPhone(String phone) async {
+  void _callPhone(String phone, [dynamic pharmacyId]) async {
+    if (pharmacyId != null) {
+      final pharmId = pharmacyId is int ? pharmacyId : int.tryParse(pharmacyId.toString());
+      if (pharmId != null) {
+        ApiService.trackEvent(pharmId, 'call_click');
+      }
+    }
     final url = Uri.parse('tel:$phone');
     if (await canLaunchUrl(url)) await launchUrl(url);
   }
@@ -129,10 +141,8 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
     return Scaffold(
       body: Stack(
         children: [
-          // Background
           Positioned(top: -40, right: -40, child: _bgCircle(180, 0.07)),
           Positioned(bottom: 80, left: -60, child: _bgCircle(220, 0.05)),
-
           Column(
             children: [
               _buildAppBar(),
@@ -180,18 +190,17 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
                 icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 20),
                 onPressed: () => Navigator.pop(context),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Нәтийжелер',
+                  LocaleService.t('results_title'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ),
               const SizedBox(width: 48),
             ],
           ),
           const SizedBox(height: 8),
-          // Selected medicines summary
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: BackdropFilter(
@@ -219,10 +228,10 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Рецептиңиз', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                          Text(LocaleService.t('your_prescription'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
                           const SizedBox(height: 2),
                           Text(
-                            '${widget.selectedMedicines.length} дәри • ${_pharmacies.length} дәрихана табылды',
+                            '${widget.selectedMedicines.length} ${LocaleService.t("results_sub")}',
                             style: const TextStyle(color: Colors.white70, fontSize: 12),
                           ),
                         ],
@@ -249,8 +258,8 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
       ),
       child: Row(
         children: [
-          _sortTab('Арзанрақ', Icons.sell_outlined, true),
-          _sortTab('Жақынрақ', Icons.near_me_outlined, false),
+          _sortTab(LocaleService.t('sort_cheap'), Icons.sell_outlined, true),
+          _sortTab(LocaleService.t('sort_near'), Icons.near_me_outlined, false),
         ],
       ),
     );
@@ -325,10 +334,8 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
   }
 
   Widget _buildPharmacyCard(Map<String, dynamic> pharmacy, int index) {
-    final stocks = List<Map<String, dynamic>>.from(pharmacy['stocks'] ?? []);
+    final medicines = List<Map<String, dynamic>>.from(pharmacy['medicines'] ?? pharmacy['stocks'] ?? []);
     final totalPrice = (pharmacy['total_price'] as num).toDouble();
-    final lat = (pharmacy['latitude'] as num).toDouble();
-    final lng = (pharmacy['longitude'] as num).toDouble();
     final distance = pharmacy['distance'] as double?;
     final phone = pharmacy['phone'] ?? '';
     final isCheapest = index == 0 && _sortByCheap;
@@ -345,7 +352,6 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
       ),
       child: Column(
         children: [
-          // Cheapest badge
           if (isCheapest)
             Container(
               width: double.infinity,
@@ -354,12 +360,12 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
                 gradient: LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF3B82F6)]),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.star_rounded, color: Colors.white, size: 16),
-                  SizedBox(width: 4),
-                  Text('Ең арзан усыныс', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12)),
+                  const Icon(Icons.star_rounded, color: Colors.white, size: 16),
+                  const SizedBox(width: 4),
+                  Text(LocaleService.t('best_price_badge'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12)),
                 ],
               ),
             ),
@@ -368,7 +374,6 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // Header
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -416,7 +421,7 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
                             children: [
                               Icon(Icons.access_time_rounded, size: 13, color: Colors.grey.shade500),
                               const SizedBox(width: 3),
-                              Text(pharmacy['work_hours'] ?? '24 саат', style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
+                              Text(pharmacy['work_hours'] ?? LocaleService.t('open_24h'), style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
                               if (distance != null) ...[
                                 const SizedBox(width: 8),
                                 Container(
@@ -444,16 +449,13 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
                       ),
                     ),
                     Text(
-                      '${totalPrice.toStringAsFixed(0)}',
+                      totalPrice.toStringAsFixed(0),
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF2563EB)),
                     ),
-                    const Text(' сўм', style: TextStyle(fontSize: 11, color: Color(0xFF2563EB), fontWeight: FontWeight.w500)),
+                    Text(' ${LocaleService.t("currency")}', style: const TextStyle(fontSize: 11, color: Color(0xFF2563EB), fontWeight: FontWeight.w500)),
                   ],
                 ),
-
                 const SizedBox(height: 12),
-
-                // Medicines
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -462,9 +464,10 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: Column(
-                    children: stocks.asMap().entries.map((e) {
+                    children: medicines.asMap().entries.map((e) {
                       final s = e.value;
-                      final last = e.key == stocks.length - 1;
+                      final last = e.key == medicines.length - 1;
+                      final medName = s['name'] ?? s['medicine_name'] ?? '';
                       return Container(
                         padding: EdgeInsets.only(bottom: last ? 0 : 8, top: e.key == 0 ? 0 : 8),
                         decoration: BoxDecoration(
@@ -475,16 +478,10 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
                             const Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF10B981)),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(s['medicine_name'], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                                  Text(s['manufacturer'], style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
-                                ],
-                              ),
+                              child: Text(medName, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                             ),
                             Text(
-                              '${(s['price'] as num).toStringAsFixed(0)} сўм',
+                              '${(s['price'] as num).toStringAsFixed(0)} ${LocaleService.t("currency")}',
                               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
                             ),
                           ],
@@ -493,26 +490,23 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
                     }).toList(),
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
-                // Action buttons
                 Row(
                   children: [
                     if (phone.isNotEmpty)
                       Expanded(
                         child: _actionBtn(
                           icon: Icons.phone_rounded,
-                          label: 'Қоңыраў',
+                          label: LocaleService.t('call_btn'),
                           colors: [const Color(0xFF059669), const Color(0xFF10B981)],
-                          onTap: () => _callPhone(phone),
+                          onTap: () => _callPhone(phone, pharmacy['id']),
                         ),
                       ),
                     if (phone.isNotEmpty) const SizedBox(width: 8),
                     Expanded(
                       child: _actionBtn(
                         icon: Icons.map_rounded,
-                        label: 'Картада',
+                        label: LocaleService.t('map_btn'),
                         colors: [const Color(0xFF2563EB), const Color(0xFF3B82F6)],
                         onTap: () => _openMap(pharmacy),
                       ),
@@ -561,13 +555,7 @@ class _ResultsScreenState extends State<ResultsScreen> with TickerProviderStateM
         children: [
           Icon(Icons.inventory_2_outlined, size: 56, color: Colors.grey.shade300),
           const SizedBox(height: 16),
-          const Text('Дәрихана табылмады', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Text(
-            'Бул дәрилер бирден бар болған\nдәрихана табылмады.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
-          ),
+          Text(LocaleService.t('empty_results'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         ],
       ),
     );

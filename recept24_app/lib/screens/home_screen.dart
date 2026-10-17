@@ -409,7 +409,7 @@ class _SearchTabState extends State<_SearchTab> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Таңланған дәрилер (${_selectedMedicines.length})', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade600)),
+          Text('${LocaleService.t("selected_meds")} ${_selectedMedicines.length}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade600)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8, runSpacing: 8,
@@ -450,11 +450,11 @@ class _SearchTabState extends State<_SearchTab> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.local_fire_department_rounded, color: Color(0xFFEF4444), size: 20),
-              SizedBox(width: 6),
-              Text('Көп сатылатуғын дәрилер', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+              const Icon(Icons.local_fire_department_rounded, color: Color(0xFFEF4444), size: 20),
+              const SizedBox(width: 6),
+              Text(LocaleService.t('popular_title'), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
             ],
           ),
           const SizedBox(height: 14),
@@ -494,7 +494,7 @@ class _SearchTabState extends State<_SearchTab> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(minPrice.toStringAsFixed(0), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF2563EB))),
-                        const Text("сўм", style: TextStyle(fontSize: 10, color: Color(0xFF2563EB))),
+                        Text(LocaleService.t('currency'), style: const TextStyle(fontSize: 10, color: Color(0xFF2563EB))),
                       ],
                     ),
                     const SizedBox(width: 8),
@@ -546,9 +546,9 @@ class _PharmaciesTabState extends State<_PharmaciesTab> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Дәриханалар', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
+              Text(LocaleService.t('pharms_title'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
               const SizedBox(height: 4),
-              Text('Нөкис қаласындағы ${_pharmacies.length} дәрихана', style: const TextStyle(fontSize: 13, color: Colors.white70)),
+              Text('${LocaleService.t("pharms_count_sub")}: ${_pharmacies.length}', style: const TextStyle(fontSize: 13, color: Colors.white70)),
             ],
           ),
         ),
@@ -593,7 +593,7 @@ class _PharmaciesTabState extends State<_PharmaciesTab> {
                               Row(children: [
                                 Icon(Icons.access_time_rounded, size: 13, color: Colors.grey.shade500),
                                 const SizedBox(width: 3),
-                                Text(p['work_hours'] ?? '24 саат', style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
+                                Text(p['work_hours'] ?? LocaleService.t('open_24h'), style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
                               ]),
                             ],
                           )),

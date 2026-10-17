@@ -99,3 +99,31 @@ class AuthToken(models.Model):
 
     def __str__(self):
         return f"Token for {self.user.username}"
+
+class PharmacyStat(models.Model):
+    pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='stats')
+    date = models.DateField(db_index=True)
+    search_impressions = models.IntegerField(default=0)
+    map_views = models.IntegerField(default=0)
+    call_clicks = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('pharmacy', 'date')
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.pharmacy.name} stat on {self.date}"
+
+class MedicineViewStat(models.Model):
+    pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='medicine_views')
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='pharmacy_views')
+    date = models.DateField(db_index=True)
+    views_count = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('pharmacy', 'medicine', 'date')
+        ordering = ['-views_count']
+
+    def __str__(self):
+        return f"{self.medicine.name} @ {self.pharmacy.name} on {self.date}"
+

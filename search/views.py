@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from django.db.models import Count, Q
-from .models import Medicine, Pharmacy, MedicineStock
+from django.db.models import Count, Q, F
+import datetime
+from .models import Medicine, Pharmacy, MedicineStock, PharmacyStat, MedicineViewStat
 
 def check_and_seed_db():
     try:
@@ -42,6 +43,20 @@ def api_init_db(request):
             'migrate_output': out.getvalue(),
         }, status=500)
 
+def _record_impressions(pharmacy, stocks):
+    try:
+        today = datetime.date.today()
+        updated = PharmacyStat.objects.filter(pharmacy=pharmacy, date=today).update(search_impressions=F('search_impressions') + 1)
+        if not updated:
+            PharmacyStat.objects.get_or_create(pharmacy=pharmacy, date=today, defaults={'search_impressions': 1})
+
+        for s in stocks:
+            m_updated = MedicineViewStat.objects.filter(pharmacy=pharmacy, medicine=s.medicine, date=today).update(views_count=F('views_count') + 1)
+            if not m_updated:
+                MedicineViewStat.objects.get_or_create(pharmacy=pharmacy, medicine=s.medicine, date=today, defaults={'views_count': 1})
+    except Exception:
+        pass
+
 def index(request):
     check_and_seed_db()
     medicine_ids = request.GET.getlist('m')
@@ -67,6 +82,7 @@ def index(request):
                     in_stock=True,
                     quantity__gt=0
                 )
+                _record_impressions(pharm, stocks)
                 total_price = sum(stock.price for stock in stocks)
                 pharmacies_data.append({
                     'pharmacy': pharm,
@@ -128,6 +144,7 @@ def api_search_pharmacies(request):
             in_stock=True,
             quantity__gt=0
         )
+        _record_impressions(pharm, stocks)
         total_price = sum(float(stock.price) for stock in stocks)
         stock_list = [{
             'medicine_name': s.medicine.name,
@@ -215,3 +232,6 @@ def about(request):
 
 def contact(request):
     return render(request, 'search/contact.html')
+
+def privacy(request):
+    return render(request, 'search/privacy.html')

@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/init-db/', views.api_init_db, name='api_init_db'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
+    path('privacy/', views.privacy, name='privacy'),
 
     # 1C Universal Webhook Integration
     path('api/sync/1c/', views_desktop.sync_1c_webhook, name='sync_1c_webhook'),
@@ -28,6 +29,10 @@ urlpatterns = [
     path('api/desktop/stock/update/', views_desktop.desktop_update_stock, name='desktop_update_stock'),
     path('api/desktop/stock/bulk-upload/', views_desktop.desktop_bulk_sync, name='desktop_bulk_sync'),
     path('api/desktop/sync-logs/', views_desktop.desktop_get_sync_logs, name='desktop_get_sync_logs'),
+
+    # Analytics & Search Statistics (Desktop App)
+    path('api/desktop/analytics/', views_desktop.desktop_analytics, name='desktop_analytics'),
+    path('api/track/event/', views_desktop.track_event, name='track_event'),
 
     # Superadmin Management (Desktop App)
     path('api/desktop/admin/users/', views_desktop.desktop_admin_get_users, name='desktop_admin_get_users'),

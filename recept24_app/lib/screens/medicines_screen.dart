@@ -16,15 +16,15 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
   List<Map<String, dynamic>> _filtered = [];
   bool _loading = true;
   final TextEditingController _searchCtrl = TextEditingController();
-  String _selectedCategory = 'Барлығы';
+  String _selectedCategoryKey = 'cat_all';
 
   final List<Map<String, dynamic>> _categories = [
-    {'label': 'Барлығы', 'icon': Icons.apps_rounded, 'value': 'Barchasi'},
-    {'label': 'Таблеткалар', 'icon': Icons.medication_rounded, 'value': 'Tabletkalar'},
-    {'label': 'Капсулалар', 'icon': Icons.vaccines_outlined, 'value': 'Kapsulalar'},
-    {'label': 'Сироплар', 'icon': Icons.water_drop_outlined, 'value': 'Siroplar'},
-    {'label': 'Порошоклар', 'icon': Icons.grain_rounded, 'value': 'Kukunlar'},
-    {'label': 'Малхамлар', 'icon': Icons.healing_outlined, 'value': 'Malhamlar'},
+    {'key': 'cat_all', 'icon': Icons.apps_rounded, 'value': 'Barchasi'},
+    {'key': 'cat_tablets', 'icon': Icons.medication_rounded, 'value': 'Tabletkalar'},
+    {'key': 'cat_capsules', 'icon': Icons.vaccines_outlined, 'value': 'Kapsulalar'},
+    {'key': 'cat_syrups', 'icon': Icons.water_drop_outlined, 'value': 'Siroplar'},
+    {'key': 'cat_powders', 'icon': Icons.grain_rounded, 'value': 'Kukunlar'},
+    {'key': 'cat_ointments', 'icon': Icons.healing_outlined, 'value': 'Malhamlar'},
   ];
 
   @override
@@ -49,8 +49,8 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
       _filtered = _allMedicines.where((m) {
         final matchSearch = _searchCtrl.text.isEmpty ||
             m['name'].toString().toLowerCase().contains(_searchCtrl.text.toLowerCase());
-        final matchCategory = _selectedCategory == 'Барлығы' ||
-            m['category'] == _categories.firstWhere((c) => c['label'] == _selectedCategory)['value'];
+        final matchCategory = _selectedCategoryKey == 'cat_all' ||
+            m['category'] == _categories.firstWhere((c) => c['key'] == _selectedCategoryKey)['value'];
         return matchSearch && matchCategory;
       }).toList();
     });
@@ -112,9 +112,12 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
               itemCount: _categories.length,
               itemBuilder: (_, i) {
                 final cat = _categories[i];
-                final active = _selectedCategory == cat['label'];
+                final active = _selectedCategoryKey == cat['key'];
                 return GestureDetector(
-                  onTap: () { _selectedCategory = cat['label'] as String; _filter(); },
+                  onTap: () {
+                    setState(() => _selectedCategoryKey = cat['key'] as String);
+                    _filter();
+                  },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     margin: const EdgeInsets.only(right: 8),
@@ -129,7 +132,7 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
                       children: [
                         Icon(cat['icon'] as IconData, size: 16, color: active ? Colors.white : Colors.grey.shade500),
                         const SizedBox(width: 6),
-                        Text(cat['label'] as String, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: active ? Colors.white : Colors.grey.shade600)),
+                        Text(LocaleService.t(cat['key'] as String), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: active ? Colors.white : Colors.grey.shade600)),
                       ],
                     ),
                   ),
@@ -144,7 +147,7 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
                     ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Icon(Icons.search_off, size: 48, color: Colors.grey.shade300),
                         const SizedBox(height: 12),
-                        Text('Дәри табылмады', style: TextStyle(fontSize: 16, color: Colors.grey.shade500)),
+                        Text(LocaleService.t('empty_results'), style: TextStyle(fontSize: 16, color: Colors.grey.shade500)),
                       ]))
                     : ListView.builder(
                         padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
@@ -197,7 +200,7 @@ class _MedicinesScreenState extends State<MedicinesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(minPrice.toStringAsFixed(0), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF2563EB))),
-                  const Text("сўм", style: TextStyle(fontSize: 11, color: Color(0xFF2563EB))),
+                  Text(LocaleService.t('currency'), style: const TextStyle(fontSize: 11, color: Color(0xFF2563EB))),
                   const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -242,7 +245,10 @@ class _AiInfoSheetState extends State<_AiInfoSheet> {
     final detail = await ApiService.getMedicineDetail(widget.medicine['id']);
     if (mounted) {
       setState(() { _detail = detail; _loadingDetail = false; });
-      if (detail != null) _startTypingAnimation(detail['description'] ?? '');
+      if (detail != null) {
+        final text = detail['description'] ?? detail['usage'] ?? '';
+        _startTypingAnimation(text);
+      }
     }
   }
 
@@ -280,14 +286,14 @@ class _AiInfoSheetState extends State<_AiInfoSheet> {
                       child: const Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.auto_awesome, size: 14, color: Colors.white),
                         SizedBox(width: 4),
-                        Text('AI Жәрдемши', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+                        Text('AI', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
                       ]),
                     ),
                     const Spacer(),
                     if (_isTyping) Row(children: [
                       SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.purple.shade300)),
                       const SizedBox(width: 6),
-                      Text('Жазылмақта...', style: TextStyle(fontSize: 12, color: Colors.purple.shade300)),
+                      Text('...', style: TextStyle(fontSize: 12, color: Colors.purple.shade300)),
                     ]),
                   ]),
                   const SizedBox(height: 16),
@@ -332,7 +338,7 @@ class _AiInfoSheetState extends State<_AiInfoSheet> {
                         Row(children: [
                           Icon(Icons.auto_awesome, size: 16, color: Colors.purple.shade400),
                           const SizedBox(width: 6),
-                          Text('Дәри ҳаққында толық мағлыўмат', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.purple.shade700)),
+                          Text(LocaleService.t('ai_info_title'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.purple.shade700)),
                         ]),
                         const SizedBox(height: 10),
                         Text(_displayedText, style: const TextStyle(fontSize: 14, color: Color(0xFF334155), height: 1.6)),
@@ -340,8 +346,8 @@ class _AiInfoSheetState extends State<_AiInfoSheet> {
                       ]),
                     ),
                     const SizedBox(height: 16),
-                    if (_detail != null && (_detail!['pharmacies'] as List).isNotEmpty) ...[
-                      Text('Дәриханалардағы бахалар', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.grey.shade800)),
+                    if (_detail != null && _detail!['pharmacies'] != null && (_detail!['pharmacies'] as List).isNotEmpty) ...[
+                      Text(LocaleService.t('results_title'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.grey.shade800)),
                       const SizedBox(height: 10),
                       ...(_detail!['pharmacies'] as List).map((p) => Container(
                         margin: const EdgeInsets.only(bottom: 8),
@@ -358,7 +364,7 @@ class _AiInfoSheetState extends State<_AiInfoSheet> {
                             Text(p['pharmacy_name'], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                             Text(p['address'], style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
                           ])),
-                          Text('${(p['price'] as num).toStringAsFixed(0)} сўм', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF2563EB))),
+                          Text('${(p['price'] as num).toStringAsFixed(0)} ${LocaleService.t("currency")}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF2563EB))),
                         ]),
                       )),
                     ],

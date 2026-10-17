@@ -7,8 +7,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import '../services/locale_service.dart';
+import '../services/api_service.dart';
 
 class MapScreen extends StatefulWidget {
+  final int? pharmacyId;
   final double pharmacyLat;
   final double pharmacyLng;
   final String pharmacyName;
@@ -17,6 +20,7 @@ class MapScreen extends StatefulWidget {
 
   const MapScreen({
     super.key,
+    this.pharmacyId,
     required this.pharmacyLat,
     required this.pharmacyLng,
     required this.pharmacyName,
@@ -31,7 +35,6 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   late final MapController _mapController;
   Position? _userPosition;
-  bool _loadingLocation = true;
   bool _loadingRoute = false;
   List<LatLng> _routePoints = [];
   double? _routeDistanceKm;
@@ -52,6 +55,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 500),
     )..forward();
+    if (widget.pharmacyId != null) {
+      ApiService.trackEvent(widget.pharmacyId, 'map_view');
+    }
     _getUserLocation();
   }
 
@@ -77,17 +83,12 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         if (mounted) {
           setState(() {
             _userPosition = pos;
-            _loadingLocation = false;
           });
           _fetchRoute(pos.latitude, pos.longitude);
           _startLiveTracking();
         }
-      } else {
-        if (mounted) setState(() => _loadingLocation = false);
       }
-    } catch (_) {
-      if (mounted) setState(() => _loadingLocation = false);
-    }
+    } catch (_) {}
   }
 
   void _startLiveTracking() {
@@ -147,6 +148,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   }
 
   void _openYandexNavigator() async {
+    if (widget.pharmacyId != null) {
+      ApiService.trackEvent(widget.pharmacyId, 'map_view');
+    }
     final url = Uri.parse(
       'https://yandex.uz/maps/?rtext=${_userPosition?.latitude ?? ''},${_userPosition?.longitude ?? ''}~${widget.pharmacyLat},${widget.pharmacyLng}&rtt=auto',
     );
@@ -156,6 +160,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   }
 
   void _openGoogleNavigator() async {
+    if (widget.pharmacyId != null) {
+      ApiService.trackEvent(widget.pharmacyId, 'map_view');
+    }
     final url = Uri.parse(
       'https://www.google.com/maps/dir/?api=1&destination=${widget.pharmacyLat},${widget.pharmacyLng}&travelmode=driving',
     );
@@ -166,6 +173,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
   void _callPhone() async {
     if (widget.pharmacyPhone.isNotEmpty) {
+      if (widget.pharmacyId != null) {
+        ApiService.trackEvent(widget.pharmacyId, 'call_click');
+      }
       final url = Uri.parse('tel:${widget.pharmacyPhone}');
       if (await canLaunchUrl(url)) await launchUrl(url);
     }
@@ -405,12 +415,12 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   color: Colors.white, borderRadius: BorderRadius.circular(10),
                   boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10)],
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB))),
-                    SizedBox(width: 8),
-                    Text('Маршрут жүкленбекте...', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                    const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB))),
+                    const SizedBox(width: 8),
+                    Text(LocaleService.t('map_loading_route'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                   ],
                 ),
               ),
@@ -526,11 +536,11 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _infoChip(Icons.straighten_rounded, _routeDistanceKm! < 1 ? '${(_routeDistanceKm! * 1000).round()} м' : '${_routeDistanceKm!.toStringAsFixed(1)} км', 'Аралық'),
+                      _infoChip(Icons.straighten_rounded, _routeDistanceKm! < 1 ? '${(_routeDistanceKm! * 1000).round()} m' : '${_routeDistanceKm!.toStringAsFixed(1)} km', LocaleService.t('map_distance')),
                       Container(width: 1, height: 30, color: const Color(0xFFBFDBFE)),
-                      _infoChip(Icons.access_time_rounded, '~$_routeDurationMin мин', 'Ўақыт'),
+                      _infoChip(Icons.access_time_rounded, '~$_routeDurationMin min', LocaleService.t('map_time')),
                       Container(width: 1, height: 30, color: const Color(0xFFBFDBFE)),
-                      _infoChip(Icons.directions_car_rounded, 'Автомобиль', 'Режим'),
+                      _infoChip(Icons.directions_car_rounded, LocaleService.t('map_car'), LocaleService.t('map_mode')),
                     ],
                   ),
                 ),
@@ -551,12 +561,12 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [BoxShadow(color: const Color(0xFF2563EB).withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.navigation_rounded, color: Colors.white, size: 18),
-                            SizedBox(width: 8),
-                            Text('Яндекс Навигатор', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                            const Icon(Icons.navigation_rounded, color: Colors.white, size: 18),
+                            const SizedBox(width: 8),
+                            Text(LocaleService.t('map_yandex'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
                           ],
                         ),
                       ),

@@ -1,0 +1,177 @@
+{% extends 'search/base.html' %}
+
+{% block title %}Maxfiylik siyosati - Recept24{% endblock %}
+
+{% block extra_css %}
+    .privacy-section {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 50px 36px;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .privacy-section h1 {
+        font-size: 32px;
+        margin-bottom: 12px;
+        color: var(--text-main);
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .privacy-section .updated-date {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-bottom: 36px;
+    }
+
+    .privacy-section h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-top: 28px;
+        margin-bottom: 12px;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 8px;
+    }
+
+    .privacy-section p, .privacy-section li {
+        font-size: 15px;
+        line-height: 1.8;
+        color: #334155;
+        margin-bottom: 14px;
+    }
+
+    .privacy-section ul {
+        padding-left: 24px;
+        margin-bottom: 16px;
+    }
+
+    .lang-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+
+    .lang-tab-btn {
+        padding: 8px 18px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        background: #f8fafc;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .lang-tab-btn.active {
+        background: #1e40af;
+        color: white;
+        border-color: #1e40af;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="privacy-section">
+        <div class="lang-tabs">
+            <button class="lang-tab-btn active" onclick="switchPrivacyLang('ru')">Русский</button>
+            <button class="lang-tab-btn" onclick="switchPrivacyLang('uz')">O'zbekcha</button>
+        </div>
+
+        <!-- RUSSIAN VERSION -->
+        <div id="privacy-ru">
+            <h1>Политика конфиденциальности</h1>
+            <div class="updated-date">Последнее обновление: 15 октября 2026 г.</div>
+
+            <p>Настоящая Политика конфиденциальности описывает, как сервис и мобильное приложение <strong>Recept24</strong> собирает, использует и защищает информацию пользователей при использовании приложения и веб-сайта.</p>
+
+            <h2>1. Общие положения</h2>
+            <p>Мы уважаем право пользователей на неприкосновенность частной жизни. Наше приложение создано для поиска лекарственных средств в аптеках, сравнения цен и построения удобных маршрутов до ближайших аптек.</p>
+
+            <h2>2. Данные, которые мы используем</h2>
+            <p>Приложение Recept24 собирает только минимально необходимые данные для функционирования сервиса:</p>
+            <ul>
+                <li><strong>Данные о местоположении:</strong> с вашего прямого согласия приложение определяет примерное или точное местоположение устройства исключительно для отображения ближайших аптек и сортировки аптек по расстоянию. Данные геолокации не сохраняются на постоянной основе и не передаются третьим лицам.</li>
+                <li><strong>Поисковые запросы:</strong> наименования искомых лекарств используются для подбора актуальных предложений из базы данных.</li>
+                <li><strong>Технические сведения:</strong> базовые данные о версии приложения и операционной системе для обеспечения стабильной работы и исправления возможных ошибок.</li>
+            </ul>
+
+            <h2>3. Разрешения устройства</h2>
+            <p>Мобильное приложение Recept24 запрашивает следующие системные разрешения:</p>
+            <ul>
+                <li><code>ACCESS_FINE_LOCATION</code> и <code>ACCESS_COARSE_LOCATION</code> — для поиска аптек рядом с вами и отображения расстояния на карте. Вы можете отключить геолокацию в любой момент в настройках устройства.</li>
+                <li><code>INTERNET</code> — для загрузки актуальных цен и остатков лекарств с центрального сервера.</li>
+            </ul>
+
+            <h2>4. Безопасность данных</h2>
+            <p>Все сетевые взаимодействия между приложением и сервером защищены шифрованием по протоколу HTTPS. Мы не продаем и не передаем персональные данные пользователей рекламным агентствам.</p>
+
+            <h2>5. Права пользователей</h2>
+            <p>Вы имеете полное право в любой момент прекратить использование приложения или отозвать выданные разрешения на доступ к геолокации в настройках операционной системы Android.</p>
+
+            <h2>6. Контакты для связи</h2>
+            <p>Если у вас возникли вопросы касательно настоящей Политики конфиденциальности, вы можете связаться с нашей службой поддержки:</p>
+            <ul>
+                <li>Электронная почта: <strong>support@recept24.uz</strong></li>
+                <li>Сайт: <strong>https://recept24.uz</strong></li>
+            </ul>
+        </div>
+
+        <!-- UZBEK VERSION -->
+        <div id="privacy-uz" style="display: none;">
+            <h1>Maxfiylik siyosati</h1>
+            <div class="updated-date">Oxirgi yangilanish: 2026-yil 15-oktabr</div>
+
+            <p>Ushbu Maxfiylik siyosati <strong>Recept24</strong> mobil ilovasi va veb-saytidan foydalanuvchilar ma'lumotlari qanday to'planishi, ishlatilishi va himoya qilinishini belgilaydi.</p>
+
+            <h2>1. Umumiy qoidalar</h2>
+            <p>Biz foydalanuvchilarning shaxsiy daxlsizligini to'liq hurmat qilamiz. Recept24 ilovasi dorixonalardagi dori vositalarini qidirish, narxlarni solishtirish va eng yaqin dorixonaga yo'nalish olish uchun yaratilgan.</p>
+
+            <h2>2. Foydalaniladigan ma'lumotlar</h2>
+            <p>Ilova faqat uning to'g'ri ishlashi uchun zarur bo'lgan minimal ma'lumotlardan foydalanadi:</p>
+            <ul>
+                <li><strong>Geolokatsiya ma'lumotlari:</strong> faqatgina sizning ruxsatingiz bilan yaqin atrofdagi dorixonalarni xaritada ko'rsatish va masofani hisoblash uchun ishlatiladi. Manzil doimiy saqlanmaydi va uchinchi shaxslarga berilmaydi.</li>
+                <li><strong>Qidiruv so'rovlari:</strong> kerakli dorilarni bazadan topish va ularni eng arzon narx bo'yicha saralash uchun xizmat qiladi.</li>
+                <li><strong>Texnik ma'lumotlar:</strong> ilovaning barqaror ishlashini ta'minlash va nosozliklarni bartaraf etish uchun qurilma turi va operatsion tizim versiyasi.</li>
+            </ul>
+
+            <h2>3. Qurilma ruxsatlari</h2>
+            <p>Recept24 ilovasi quyidagi ruxsatlarni so'raydi:</p>
+            <ul>
+                <li><code>ACCESS_FINE_LOCATION</code> va <code>ACCESS_COARSE_LOCATION</code> — eng yaqin dorixonalarni aniqlash uchun. Bu ruxsatni istalgan paytda telefon sozlamalaridan o'chirib qo'yishingiz mumkin.</li>
+                <li><code>INTERNET</code> — dorixonalardagi amaldagi narxlar va qoldiqlarni markaziy serverdan yangilash uchun.</li>
+            </ul>
+
+            <h2>4. Ma'lumotlar xavfsizligi</h2>
+            <p>Server bilan barcha aloqalar xavfsiz HTTPS protokoli orqali amalga oshiriladi. Ma'lumotlar uchinchi shaxslarga yoki reklama kompaniyalariga sotilmaydi.</p>
+
+            <h2>5. Bog'lanish</h2>
+            <p>Savollar va takliflar bo'yicha biz bilan bog'lanishingiz mumkin:</p>
+            <ul>
+                <li>Elektron pochta: <strong>support@recept24.uz</strong></li>
+                <li>Rasmiy veb-sayt: <strong>https://recept24.uz</strong></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchPrivacyLang(lang) {
+        document.querySelectorAll('.lang-tab-btn').forEach(btn => btn.classList.remove('active'));
+        if (lang === 'ru') {
+            document.getElementById('privacy-ru').style.display = 'block';
+            document.getElementById('privacy-uz').style.display = 'none';
+            event.target.classList.add('active');
+        } else {
+            document.getElementById('privacy-ru').style.display = 'none';
+            document.getElementById('privacy-uz').style.display = 'block';
+            event.target.classList.add('active');
+        }
+    }
+</script>
+{% endblock %}

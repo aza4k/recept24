@@ -1,12 +1,15 @@
 import json
 import secrets
+import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Q, Sum, F, Count
 from django.utils import timezone
-from .models import Pharmacy, Medicine, MedicineStock, PharmacySyncLog, AuthToken
+from .models import Pharmacy, Medicine, MedicineStock, PharmacySyncLog, AuthToken, PharmacyStat, MedicineViewStat
+
 
 def _get_auth_user(request):
     """Token orqali foydalanuvchini aniqlash (Bearer <token>)"""
@@ -568,3 +571,208 @@ def desktop_get_sync_logs(request):
         })
 
     return JsonResponse({'logs': result})
+
+def desktop_analytics(request):
+    """
+    Dorixona uchun to'liq va aniq real analitika:
+    - Baza jadvallaridan olingan haqiqiy qidiruvlar soni
+    - Har bir dori haqiqatda necha marta ko'rsatilganligi
+    - Xarita ochilgan va marshrut olingan aniq soni
+    - Qo'ng'iroqlar aniq soni
+    - Eng arzon narx tavsiyasi bo'lgan dorilar soni
+    - 7 kunlik real dinamika
+    """
+    user = _get_auth_user(request)
+    if not user:
+        return JsonResponse({'error': 'Avtorizatsiya talab qilinadi'}, status=401)
+
+    pharmacy = user.pharmacies.first()
+    if not pharmacy:
+        if user.is_superuser:
+            pharmacy = Pharmacy.objects.first()
+        if not pharmacy:
+            return JsonResponse({'status': 'error', 'error': 'Dorixona topilmadi'}, status=404)
+
+    period = request.GET.get('period', '7d')
+    today = datetime.date.today()
+    if period == 'today':
+        start_date = today
+    elif period == '30d':
+        start_date = today - datetime.timedelta(days=29)
+    else:
+        start_date = today - datetime.timedelta(days=6)
+
+    # 1. Haqiqiy qidiruvlar, xarita ko'rishlari va qo'ng'iroqlar
+    stats_qs = PharmacyStat.objects.filter(pharmacy=pharmacy, date__gte=start_date, date__lte=today)
+    agg_stats = stats_qs.aggregate(
+        total_searches=Sum('search_impressions'),
+        total_maps=Sum('map_views'),
+        total_calls=Sum('call_clicks')
+    )
+    search_impressions = agg_stats['total_searches'] or 0
+    map_views = agg_stats['total_maps'] or 0
+    call_clicks = agg_stats['total_calls'] or 0
+
+    # 2. Haqiqiy dori ko'rsatilishlari
+    med_stats_qs = MedicineViewStat.objects.filter(
+        pharmacy=pharmacy, date__gte=start_date, date__lte=today
+    ).values('medicine_id', 'medicine__name', 'medicine__category').annotate(
+        total_views=Sum('views_count')
+    ).order_by('-total_views')
+
+    total_med_views = sum(m['total_views'] for m in med_stats_qs)
+
+    # 3. Dorixona qoldiqlari
+    stocks_qs = MedicineStock.objects.filter(pharmacy=pharmacy).select_related('medicine')
+    stocks_dict = {s.medicine_id: s for s in stocks_qs}
+    total_sku = stocks_qs.count()
+    in_stock_count = stocks_qs.filter(in_stock=True, quantity__gt=0).count()
+    out_stock_count = stocks_qs.filter(Q(in_stock=False) | Q(quantity=0)).count()
+
+    total_valuation = sum(float(s.price * s.quantity) for s in stocks_qs if s.in_stock and s.quantity > 0)
+    avg_price = (sum(float(s.price) for s in stocks_qs) / total_sku) if total_sku > 0 else 0
+
+    # 4. Aniq eng arzon narx tavsiyalari soni
+    best_price_count = 0
+    cheapest_med_ids = set()
+    for s in stocks_qs:
+        if s.in_stock and s.quantity > 0:
+            min_in_system = MedicineStock.objects.filter(
+                medicine_id=s.medicine_id, in_stock=True, quantity__gt=0
+            ).order_by('price').values_list('price', flat=True).first()
+            if min_in_system is not None and s.price <= min_in_system:
+                best_price_count += 1
+                cheapest_med_ids.add(s.medicine_id)
+
+    # 5. Top dorilar ro'yxati (haqiqiy ko'rsatilishlar bo'yicha)
+    top_medicines = []
+    seen_ids = set()
+    for item in med_stats_qs[:10]:
+        med_id = item['medicine_id']
+        seen_ids.add(med_id)
+        stock = stocks_dict.get(med_id)
+        views = item['total_views']
+        share = round((views / total_med_views) * 100, 1) if total_med_views > 0 else 0
+        top_medicines.append({
+            'medicine_id': med_id,
+            'name': item['medicine__name'],
+            'category': item['medicine__category'],
+            'price': float(stock.price) if stock else 0,
+            'quantity': stock.quantity if stock else 0,
+            'in_stock': bool(stock and stock.in_stock and stock.quantity > 0),
+            'views_count': views,
+            'is_cheapest': med_id in cheapest_med_ids,
+            'share_pct': share,
+        })
+
+    # Agar ko'rilgan dorilar 10 tadan kam bo'lsa, mavjud dorilarni 0 ko'rish bilan qo'shish
+    if len(top_medicines) < 10:
+        for s in stocks_qs:
+            if s.medicine_id not in seen_ids:
+                seen_ids.add(s.medicine_id)
+                top_medicines.append({
+                    'medicine_id': s.medicine_id,
+                    'name': s.medicine.name,
+                    'category': s.medicine.category,
+                    'price': float(s.price),
+                    'quantity': s.quantity,
+                    'in_stock': bool(s.in_stock and s.quantity > 0),
+                    'views_count': 0,
+                    'is_cheapest': s.medicine_id in cheapest_med_ids,
+                    'share_pct': 0,
+                })
+                if len(top_medicines) >= 10:
+                    break
+
+    # 6. Haqiqiy konversiya darajasi
+    conversion_rate = round(((map_views + call_clicks) / search_impressions) * 100, 1) if search_impressions > 0 else 0.0
+
+    # 7. Oxirgi 7 kunlik real statistika
+    daily_stats_map = {ps.date: ps for ps in PharmacyStat.objects.filter(
+        pharmacy=pharmacy, date__gte=today - datetime.timedelta(days=6), date__lte=today
+    )}
+
+    day_names_kaa = ['Дүйшемби', 'Сейшемби', 'Сәршемби', 'Пийшемби', 'Жума', 'Шемби', 'Екшемби']
+    daily_trends = []
+    for i in range(6, -1, -1):
+        d = today - datetime.timedelta(days=i)
+        day_idx = d.weekday()
+        ps = daily_stats_map.get(d)
+        daily_trends.append({
+            'date': d.strftime('%d.%m'),
+            'day_idx': day_idx,
+            'day_name': day_names_kaa[day_idx],
+            'searches': ps.search_impressions if ps else 0,
+            'map_views': ps.map_views if ps else 0,
+            'calls': ps.call_clicks if ps else 0,
+        })
+
+    return JsonResponse({
+        'status': 'ok',
+        'pharmacy_id': pharmacy.id,
+        'pharmacy_name': pharmacy.name,
+        'period': period,
+        'summary': {
+            'search_impressions': search_impressions,
+            'medicine_views': total_med_views,
+            'map_views': map_views,
+            'call_clicks': call_clicks,
+            'best_price_count': best_price_count,
+            'conversion_rate': conversion_rate,
+            'total_sku': total_sku,
+            'in_stock_count': in_stock_count,
+            'out_stock_count': out_stock_count,
+            'total_valuation': round(total_valuation),
+            'avg_price': round(avg_price),
+        },
+        'daily_trends': daily_trends,
+        'top_medicines': top_medicines[:10],
+    })
+
+@csrf_exempt
+def track_event(request):
+    """Mobil ilova va saytdan qidiruv, karta va qo'ng'iroqlarni aniq hisoblab borish"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        pharmacy_id = data.get('pharmacy_id')
+        event_type = data.get('event_type')
+        medicine_id = data.get('medicine_id')
+    except Exception:
+        pharmacy_id = request.POST.get('pharmacy_id')
+        event_type = request.POST.get('event_type')
+        medicine_id = request.POST.get('medicine_id')
+
+    if not pharmacy_id or not event_type:
+        return JsonResponse({'error': 'Missing parameters'}, status=400)
+
+    pharmacy = Pharmacy.objects.filter(id=pharmacy_id).first()
+    if not pharmacy:
+        return JsonResponse({'error': 'Pharmacy not found'}, status=404)
+
+    today = datetime.date.today()
+    if event_type == 'map_view':
+        updated = PharmacyStat.objects.filter(pharmacy=pharmacy, date=today).update(map_views=F('map_views') + 1)
+        if not updated:
+            PharmacyStat.objects.get_or_create(pharmacy=pharmacy, date=today, defaults={'map_views': 1})
+    elif event_type == 'call_click':
+        updated = PharmacyStat.objects.filter(pharmacy=pharmacy, date=today).update(call_clicks=F('call_clicks') + 1)
+        if not updated:
+            PharmacyStat.objects.get_or_create(pharmacy=pharmacy, date=today, defaults={'call_clicks': 1})
+    elif event_type == 'search_impression':
+        updated = PharmacyStat.objects.filter(pharmacy=pharmacy, date=today).update(search_impressions=F('search_impressions') + 1)
+        if not updated:
+            PharmacyStat.objects.get_or_create(pharmacy=pharmacy, date=today, defaults={'search_impressions': 1})
+
+    if medicine_id and event_type in ['medicine_view', 'search_impression']:
+        med = Medicine.objects.filter(id=medicine_id).first()
+        if med:
+            m_updated = MedicineViewStat.objects.filter(pharmacy=pharmacy, medicine=med, date=today).update(views_count=F('views_count') + 1)
+            if not m_updated:
+                MedicineViewStat.objects.get_or_create(pharmacy=pharmacy, medicine=med, date=today, defaults={'views_count': 1})
+
+    return JsonResponse({'status': 'ok'})
+
+
